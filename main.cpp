@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
         std::cout << block_size << std::endl;
     }
 
-
+    
 
     
     return 0;
