@@ -10,7 +10,7 @@ private:
 public:
     // Construct a dummy cache with shape: associativity, num of cache set, 2
     // 2: index 0 for states, index 1 for tag
-    void set_params(int blk_size, int cache_size, int associativity) {
+    void set_params(int cache_size, int associativity, int blk_size) {
         max_index = (cache_size / blk_size) / associativity;
         std::vector<int> temp(2, 0);
         std::vector<std::vector<int>> temp2;

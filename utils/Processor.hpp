@@ -14,8 +14,10 @@ private:
     std::string str_val;
     std::stringstream ss;
     int index_test;
+
+    Cache* cache = new Cache();
 public:
-    void load_input_file(benchmark bm, int index) {
+    void initialize(int index, benchmark bm, int cache_size, int associativity, int block_size) {
         std::string path;
         switch(bm) {
             case benchmark::blackscholes:
@@ -32,6 +34,9 @@ public:
         index_test = index;
         bm_file.open(path, std::ifstream::in);
         // std::cout << bm_file.is_open() << std::endl;
+
+        cache->set_params(cache_size, associativity, block_size);
+
         return;
     }
 
