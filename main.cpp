@@ -39,18 +39,25 @@ int main(int argc, char* argv[]) {
         ss >> block_size;
     }
 
-    Processor core0;
-    Processor core1;
-    Processor core2;
-    Processor core3;
-    core0.load_input_file(input_file, 0);
-    core1.load_input_file(input_file, 1);
-    core2.load_input_file(input_file, 2);
-    core3.load_input_file(input_file, 3);
+    Processor* core0 = new Processor();
+    Processor* core1 = new Processor();
+    Processor* core2 = new Processor();
+    Processor* core3 = new Processor();
+    core0->load_input_file(input_file, 0);
+    core1->load_input_file(input_file, 1);
+    core2->load_input_file(input_file, 2);
+    core3->load_input_file(input_file, 3);
 
+    std::thread th0(&Processor::run, core0);
+    std::thread th1(&Processor::run, core1);
+    std::thread th2(&Processor::run, core2);
+    std::thread th3(&Processor::run, core3);
 
-
+    th0.join();
     th1.join();
+    th2.join();
+    th3.join();
     
+
     return 0;
 }

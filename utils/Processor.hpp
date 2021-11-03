@@ -13,6 +13,7 @@ private:
     uint32_t val;
     std::string str_val;
     std::stringstream ss;
+    int index_test;
 public:
     void load_input_file(benchmark bm, int index) {
         std::string path;
@@ -28,17 +29,20 @@ public:
                 break;  
         }
         path += std::to_string(index) + ".data";
+        index_test = index;
         bm_file.open(path, std::ifstream::in);
+        // std::cout << bm_file.is_open() << std::endl;
         return;
     }
 
     void run() {
-        bm_file >> instr >> str_val;
-        ss.clear();
-        ss << std::hex << str_val;
-        ss >> val;
-            
-        std::cout << instr << " | " << val << std::endl;        
+        while(bm_file >> instr >> str_val) {
+            ss.clear();
+            ss << std::hex << str_val;
+            ss >> val;
+                
+            std::cout << "[" << index_test << "]  " << instr << " | " << val << std::endl;   
+        }     
         return; 
     }
 };
