@@ -9,13 +9,18 @@ class Processor {
 private:    
     int total_cycle = 0;
     std::ifstream bm_file;
+    int N = 1; // offset size
+    int M = 1; // number of sets
+
+    Cache* cache = new Cache();
+
     uint32_t instr;
     uint32_t val;
     std::string str_val;
     std::stringstream ss;
     int index_test;
 
-    Cache* cache = new Cache();
+
 public:
     void initialize(int index, benchmark bm, int cache_size, int associativity, int block_size) {
         std::string path;
@@ -35,6 +40,16 @@ public:
         bm_file.open(path, std::ifstream::in);
         // std::cout << bm_file.is_open() << std::endl;
 
+        if (cache_size % block_size != 0) {
+            std::cout << "[ERROR] Cache size must be divisible by block size." << std::endl;
+            return;
+        } else if ((cache_size/block_size) % associativity != 0) {
+            std::cout << "[ERROR] The total number of cache block must be divisible by associativity." << std::endl;
+            return;
+        }
+        M = (cache_size / block_size) / associativity;
+        N = block_size;
+
         cache->set_params(cache_size, associativity, block_size);
 
         return;
@@ -46,7 +61,23 @@ public:
             ss << std::hex << str_val;
             ss >> val;
                 
-            std::cout << "[" << index_test << "]  " << instr << " | " << val << std::endl;   
+            // std::cout << "[" << index_test << "]  " << instr << " | " << val << std::endl;
+            
+            if (instr == 0 || instr == 1) {
+                int set_index = (val / N) % M;
+                int tag = (val / N) / M;
+                if (instr == 0) { // read
+                    total_cycle += cache->pr_read(set_index, tag);
+                } else { // write
+                    total_cycle += cache->pr_write(set_index, tag);
+                }
+            } else {
+                if (instr != 2) {
+                    std::cout << "[ERROR] Instr index value goes out of range." << std::endl;
+                    return;
+                }
+                total_cycle += val;
+            }
         }     
         return; 
     }
