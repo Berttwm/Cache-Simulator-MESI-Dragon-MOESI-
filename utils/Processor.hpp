@@ -51,6 +51,9 @@ public:
                 path = "fluidanimate_four/fluidanimate_";
                 break;  
         }
+        // !!! FOR TEST BRANCH ONLY !!!
+        path = "test_four/test_"; 
+
         path += std::to_string(index) + ".data";
         index_test = index;
         bm_file.open(path, std::ifstream::in);
@@ -92,6 +95,7 @@ public:
                 }
                 total_cycle += val;
             }
+            std::cout << "Total cycles: " << total_cycle << std::endl;
         }     
         return; 
     }

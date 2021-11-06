@@ -34,7 +34,6 @@ class Cache_MESI : public Cache {
 private:
      
 public:
-    
 
     int pr_read(int i_set, int tag) {
         for (int i = 0; i < num_ways; i++) {
@@ -43,6 +42,7 @@ public:
                 return 1;
         }
         // Read miss
+        std::cout << "Read Miss" << std::endl;
         return 1; // placeholder
     }
 
@@ -65,7 +65,7 @@ public:
                 
         }
         // Write miss
-
+        return 1; // placeholder
     } 
     
 };
