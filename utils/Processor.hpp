@@ -35,7 +35,7 @@ public:
             break;
 
         default:
-            std::cout << "[ERROR] Protocal type goes wrong." << std::endl; 
+            std::cout << "[ERROR] Protocol type goes wrong." << std::endl; 
             return;   
         }
         
