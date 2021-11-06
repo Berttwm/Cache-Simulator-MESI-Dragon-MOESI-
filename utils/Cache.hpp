@@ -34,8 +34,6 @@ class Cache_MESI : public Cache {
 private:
      
 public:
-    
-
     int pr_read(int i_set, int tag) {
         for (int i = 0; i < num_ways; i++) {
             // Read hit
@@ -43,6 +41,7 @@ public:
                 return 1;
         }
         // Read miss
+        // TODO: check bus then update status
         return 1; // placeholder
     }
 
@@ -58,6 +57,7 @@ public:
                     // TODO: update bus
                     return 1;
                 case status_MESI::S:
+                    // TODO: update bus
                     break;
 
                 }
@@ -65,7 +65,7 @@ public:
                 
         }
         // Write miss
-
+        return 1; // placeholder
     } 
     
 };
@@ -73,10 +73,35 @@ public:
 class Cache_Dragon : public Cache {
 public:
     int pr_read(int i_set, int tag) {
-        return 1;
+        for (int i = 0; i < num_ways; i++) {
+            // Read hit
+            if ((dummy_cache[i][i_set][0] != 0) && (dummy_cache[i][i_set][1] == tag))
+                return 1;
+        }
+        // Read miss
+        return 1; // placeholder
     }
 
     int pr_write(int i_set, int tag) {
+        for (int i = 0; i < num_ways; i++) {
+            // Write hit
+            if ((dummy_cache[i][i_set][0] != 0) && (dummy_cache[i][i_set][1] == tag)) {
+                switch (dummy_cache[i][i_set][0]) {
+                case status_Dragon::E:
+                    // TODO
+                    break;
+                case status_Dragon::Sc:
+                    // TODO update other caches thru bus
+                    break;
+                case status_Dragon::Sm:
+                    // TODO: update other caches thru bus
+                case status_Dragon::D:
+                    return 1;
+                }
+            }
+            
+        }
+        // TODO: handle the case when the block not in cache
         return 1;
     }
 };
