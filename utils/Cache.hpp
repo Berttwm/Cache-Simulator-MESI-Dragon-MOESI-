@@ -3,12 +3,13 @@
 
 #include "config.hpp"
 
+// Abstract class Cache
 class Cache {
-private:
+public:
     int num_sets;
     int num_ways;
-    std::vector<std::vector<std::vector<int>>> dummy_cache; 
-public:
+    std::vector<std::vector<std::vector<int>>> dummy_cache;
+
     // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
     // 2: index 0 for states, index 1 for tag
     void set_params(int cache_size, int associativity, int blk_size) {
@@ -24,6 +25,17 @@ public:
         }
     }
 
+    virtual int pr_read(int i_set, int tag) = 0;
+    virtual int pr_write(int i_set, int tag) = 0;
+        
+};
+
+class Cache_MESI : public Cache {
+private:
+     
+public:
+    
+
     int pr_read(int i_set, int tag) {
         for (int i = 0; i < num_ways; i++) {
             // Read hit
@@ -35,7 +47,36 @@ public:
     }
 
     int pr_write(int i_set, int tag) {
-        return 1; // placeholder
+        for (int i = 0; i < num_ways; i++) {
+            // Write hit
+            if ((dummy_cache[i][i_set][0] != status_MESI::I) && (dummy_cache[i][i_set][1] == tag)) {
+                switch (dummy_cache[i][i_set][0]) {
+                case status_MESI::M:
+                    return 1;                
+                case status_MESI::E:
+                    dummy_cache[i][i_set][0] = M;
+                    // TODO: update bus
+                    return 1;
+                case status_MESI::S:
+                    break;
+
+                }
+            }
+                
+        }
+        // Write miss
+
     } 
     
+};
+
+class Cache_Dragon : public Cache {
+public:
+    int pr_read(int i_set, int tag) {
+        return 1;
+    }
+
+    int pr_write(int i_set, int tag) {
+        return 1;
+    }
 };

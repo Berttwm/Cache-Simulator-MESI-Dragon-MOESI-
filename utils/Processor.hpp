@@ -12,7 +12,7 @@ private:
     int N = 1; // offset size
     int M = 1; // number of sets
 
-    Cache* cache = new Cache();
+    Cache* cache;
 
     uint32_t instr;
     uint32_t val;
@@ -22,7 +22,23 @@ private:
 
 
 public:
-    void initialize(int index, benchmark bm, int cache_size, int associativity, int block_size) {
+    void initialize(int index, protocal prot, benchmark bm, int cache_size, int associativity, int block_size) {
+        switch (prot) {
+        case protocal::MESI:
+            cache = new Cache_MESI();
+            cache->set_params(cache_size, associativity, block_size);
+            break;
+        
+        case protocal::Dragon:
+            cache = new Cache_Dragon();
+            cache->set_params(cache_size, associativity, block_size);
+            break;
+
+        default:
+            std::cout << "[ERROR] Protocal type goes wrong." << std::endl; 
+            return;   
+        }
+        
         std::string path;
         switch(bm) {
             case benchmark::blackscholes:
@@ -49,9 +65,7 @@ public:
         }
         M = (cache_size / block_size) / associativity;
         N = block_size;
-
-        cache->set_params(cache_size, associativity, block_size);
-
+        
         return;
     }
 

@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
     Processor* core1 = new Processor();
     Processor* core2 = new Processor();
     Processor* core3 = new Processor();
-    core0->initialize(0, input_file, cache_size, associativity, block_size);
-    core1->initialize(1, input_file, cache_size, associativity, block_size);
-    core2->initialize(2, input_file, cache_size, associativity, block_size);
-    core3->initialize(3, input_file, cache_size, associativity, block_size);
+    core0->initialize(0, curr_protocal, input_file, cache_size, associativity, block_size);
+    core1->initialize(1, curr_protocal, input_file, cache_size, associativity, block_size);
+    core2->initialize(2, curr_protocal, input_file, cache_size, associativity, block_size);
+    core3->initialize(3, curr_protocal, input_file, cache_size, associativity, block_size);
 
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);
