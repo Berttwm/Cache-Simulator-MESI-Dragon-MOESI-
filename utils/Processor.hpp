@@ -22,14 +22,14 @@ private:
 
 
 public:
-    void initialize(int index, protocal prot, benchmark bm, int cache_size, int associativity, int block_size) {
+    void initialize(int index, protocol prot, benchmark bm, int cache_size, int associativity, int block_size) {
         switch (prot) {
-        case protocal::MESI:
+        case protocol::MESI:
             cache = new Cache_MESI();
             cache->set_params(cache_size, associativity, block_size);
             break;
         
-        case protocal::Dragon:
+        case protocol::Dragon:
             cache = new Cache_Dragon();
             cache->set_params(cache_size, associativity, block_size);
             break;
@@ -65,7 +65,7 @@ public:
         }
         M = (cache_size / block_size) / associativity;
         N = block_size;
-        
+
         return;
     }
 

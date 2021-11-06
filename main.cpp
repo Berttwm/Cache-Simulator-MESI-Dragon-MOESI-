@@ -9,7 +9,7 @@
 
 int main(int argc, char* argv[]) {
 
-    protocal curr_protocal;
+    protocol curr_protocol;
     benchmark input_file;
     int cache_size = 4096; // value in bytes
     int associativity = 2;
@@ -19,8 +19,8 @@ int main(int argc, char* argv[]) {
         std::cout << "[ERROR] Only " << argc << " arguments in command line, need 5 arguments." << std::endl;
         return 0;
     } else {
-        if (strcmp(argv[1],"MESI") == 0) curr_protocal = MESI;
-        else if (strcmp(argv[1],"Dragon") == 0) curr_protocal = Dragon;
+        if (strcmp(argv[1],"MESI") == 0) curr_protocol = MESI;
+        else if (strcmp(argv[1],"Dragon") == 0) curr_protocol = Dragon;
         else std::cout << "[ERROR] Wrong protocol. Only MESI and Dragon are supported. " << std::endl;
 
         if (strcmp(argv[2],"blackscholes") == 0) input_file = blackscholes;
@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
     Processor* core1 = new Processor();
     Processor* core2 = new Processor();
     Processor* core3 = new Processor();
-    core0->initialize(0, curr_protocal, input_file, cache_size, associativity, block_size);
-    core1->initialize(1, curr_protocal, input_file, cache_size, associativity, block_size);
-    core2->initialize(2, curr_protocal, input_file, cache_size, associativity, block_size);
-    core3->initialize(3, curr_protocal, input_file, cache_size, associativity, block_size);
+    core0->initialize(0, curr_protocol, input_file, cache_size, associativity, block_size);
+    core1->initialize(1, curr_protocol, input_file, cache_size, associativity, block_size);
+    core2->initialize(2, curr_protocol, input_file, cache_size, associativity, block_size);
+    core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size);
 
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);
