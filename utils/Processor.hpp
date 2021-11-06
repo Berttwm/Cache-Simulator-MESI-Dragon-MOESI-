@@ -4,7 +4,7 @@
 
 #include "config.hpp"
 #include "Cache.hpp"
-
+#include "Bus.hpp"
 class Processor {
 private:    
     int total_cycle = 0;
@@ -13,16 +13,16 @@ private:
     int M = 1; // number of sets
 
     Cache* cache;
-
+    Bus* bus;
     uint32_t instr;
     uint32_t val;
     std::string str_val;
     std::stringstream ss;
-    int index_test;
+    int index_test; // PID
 
 
 public:
-    void initialize(int index, protocol prot, benchmark bm, int cache_size, int associativity, int block_size) {
+    void initialize(int index, protocol prot, benchmark bm, int cache_size, int associativity, int block_size, Bus *bus) {
         switch (prot) {
         case protocol::MESI:
             cache = new Cache_MESI();
@@ -35,7 +35,7 @@ public:
             break;
 
         default:
-            std::cout << "[ERROR] Protocol type goes wrong." << std::endl; 
+            std::cout << "[ERROR] Protocol type wrong (in cache)." << std::endl; 
             return;   
         }
         
@@ -66,6 +66,8 @@ public:
         M = (cache_size / block_size) / associativity;
         N = block_size;
 
+        this->bus = bus;
+
         return;
     }
 
@@ -79,6 +81,7 @@ public:
             
             if (instr == 0 || instr == 1) {
                 int set_index = (val / N) % M;
+                std::cout << "[" << set_index << "]" << std::endl;
                 int tag = (val / N) / M;
                 if (instr == 0) { // read
                     total_cycle += cache->pr_read(set_index, tag);

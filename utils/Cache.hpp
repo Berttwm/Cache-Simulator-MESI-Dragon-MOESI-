@@ -9,8 +9,7 @@ public:
     int num_sets;
     int num_ways;
     std::vector<std::vector<std::vector<int>>> dummy_cache;
-
-    // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
+    // // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
     // 2: index 0 for states, index 1 for tag
     void set_params(int cache_size, int associativity, int blk_size) {
         num_ways = associativity;
@@ -52,8 +51,8 @@ public:
                 switch (dummy_cache[i][i_set][0]) {
                 case status_MESI::M:
                     return 1;                
-                case status_MESI::E:
-                    dummy_cache[i][i_set][0] = M;
+                case status_MESI::E_MESI:
+                    dummy_cache[i][i_set][0] = status_MESI::M;
                     // TODO: update bus
                     return 1;
                 case status_MESI::S:
@@ -87,7 +86,7 @@ public:
             // Write hit
             if ((dummy_cache[i][i_set][0] != 0) && (dummy_cache[i][i_set][1] == tag)) {
                 switch (dummy_cache[i][i_set][0]) {
-                case status_Dragon::E:
+                case status_Dragon::E_DRAGON:
                     // TODO
                     break;
                 case status_Dragon::Sc:

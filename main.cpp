@@ -5,6 +5,8 @@
 #include <string.h>
 
 #include "utils/Processor.hpp"
+#include "utils/Bus.hpp"
+
 
 
 int main(int argc, char* argv[]) {
@@ -19,13 +21,13 @@ int main(int argc, char* argv[]) {
         std::cout << "[ERROR] Only " << argc << " arguments in command line, need 5 arguments." << std::endl;
         return 0;
     } else {
-        if (strcmp(argv[1],"MESI") == 0) curr_protocol = MESI;
-        else if (strcmp(argv[1],"Dragon") == 0) curr_protocol = Dragon;
+        if (strcmp(argv[1],"MESI") == 0) curr_protocol = protocol::MESI;
+        else if (strcmp(argv[1],"Dragon") == 0) curr_protocol = protocol::Dragon;
         else std::cout << "[ERROR] Wrong protocol. Only MESI and Dragon are supported. " << std::endl;
 
-        if (strcmp(argv[2],"blackscholes") == 0) input_file = blackscholes;
-        else if (strcmp(argv[2],"bodytrack") == 0) input_file = bodytrack;
-        else if (strcmp(argv[2],"fluidanimate") == 0) input_file = fluidanimate;
+        if (strcmp(argv[2],"blackscholes") == 0) input_file = benchmark::blackscholes;
+        else if (strcmp(argv[2],"bodytrack") == 0) input_file = benchmark::bodytrack;
+        else if (strcmp(argv[2],"fluidanimate") == 0) input_file = benchmark::fluidanimate;
         else std::cout << "[ERROR] Wrong benchmark. Only blackscholes, bodytrack and fluidanimate are supported. " << std::endl; 
         
         std::stringstream ss;
@@ -39,14 +41,30 @@ int main(int argc, char* argv[]) {
         ss >> block_size;
     }
 
+    // Initialize Bus:
+    Bus *bus;
+    switch (curr_protocol) {
+        case protocol::MESI:
+            bus = new Bus_MESI();
+            break;
+        case protocol::Dragon:
+            bus = new Bus_Dragon();
+            break;
+        default:
+            std::cout << "[ERROR] Protocol type wrong (in bus)." << std::endl; 
+            return -1; 
+    }
+    bus->init_bus(cache_size, associativity, block_size);
+
+    // Initialize Cores:
     Processor* core0 = new Processor();
     Processor* core1 = new Processor();
     Processor* core2 = new Processor();
     Processor* core3 = new Processor();
-    core0->initialize(0, curr_protocol, input_file, cache_size, associativity, block_size);
-    core1->initialize(1, curr_protocol, input_file, cache_size, associativity, block_size);
-    core2->initialize(2, curr_protocol, input_file, cache_size, associativity, block_size);
-    core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size);
+    core0->initialize(0, curr_protocol, input_file, cache_size, associativity, block_size, bus);
+    core1->initialize(1, curr_protocol, input_file, cache_size, associativity, block_size, bus);
+    core2->initialize(2, curr_protocol, input_file, cache_size, associativity, block_size, bus);
+    core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size, bus);
 
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);
