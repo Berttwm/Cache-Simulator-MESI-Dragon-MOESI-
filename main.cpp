@@ -45,7 +45,18 @@ int main(int argc, char* argv[]) {
     GlobalLock *gl = new GlobalLock(cache_size, associativity, block_size);
 
     // Initialize Bus:
-    Bus *bus = new Bus();
+    Bus *bus;
+    switch (curr_protocol) {
+        case protocol::MESI:
+            bus = new Bus_MESI();
+            break;
+        case protocol::Dragon:
+            bus = new Bus_Dragon();
+            break;
+        default:
+            std::cout << "[ERROR] Protocol type wrong (in bus)." << std::endl; 
+            return -1; 
+    }
     bus->init_bus(cache_size, associativity, block_size, gl);
 
     // Initialize Cores:

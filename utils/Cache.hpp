@@ -1,10 +1,13 @@
+#ifndef _CACHE_HPP
+#define _CACHE_HPP
+
 #include <iostream>
 #include <vector>
 
 #include "config.hpp"
-#include "Bus.hpp"
 #include "GlobalLock.hpp"
 
+class Bus;
 
 
 // Abstract class Cache
@@ -39,6 +42,8 @@ public:
 
     virtual int pr_read(int i_set, int tag) = 0;
     virtual int pr_write(int i_set, int tag) = 0;
+    /* Cache to bus transactions */
+    virtual void update_cacheline(int i_set, int tag) = 0;
         
 };
 
@@ -81,9 +86,9 @@ public:
         return 1; // placeholder
     } 
     /* Cache to Bus transaction API 
-    * 1) flush_cacheline: enter 
+    * 1) update_cacheline: invalidate all cacheline entries 
     */
-    void flush_cacheline(int i_set, int tag) {
+    void update_cacheline(int i_set, int tag) {
         // access to this method means cache is already locked
         for(int i = 0; i < num_ways; i++) {
             if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
@@ -128,4 +133,29 @@ public:
         // TODO: handle the case when the block not in cache
         return 1;
     }
+    /* Cache to Bus transaction API 
+    * 1) update_cacheline: invalidate all cacheline entries 
+    */
+    void update_cacheline(int i_set, int tag) {
+        // access to this method means cache is already locked
+        for(int i = 0; i < num_ways; i++) {
+            if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
+                switch (dummy_cache[i][i_set][cache_line::status]) {
+                case status_Dragon::E_DRAGON:
+                    // This case should not be possible 
+                    break;
+                case status_Dragon::Sc:
+                    break;
+                case status_Dragon::Sm:
+                    // This case should not be possible 
+                    break;
+                case status_Dragon::D:
+                    break;
+                }
+            }
+        }
+    }
+    
 };
+
+#endif // _CACHE_HPP

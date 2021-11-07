@@ -6,7 +6,7 @@
 #include <unordered_set>
 
 #include "GlobalLock.hpp"
-
+class Cache;
 
 class Bus {
    private:
@@ -21,7 +21,7 @@ class Bus {
     int associativity;
     int offset;
     GlobalLock *gl;
-    // // latest_memory has the view of the latest memory written
+    // // latest_memory has the view of the latest memory written - do we need this?
     // std::vector<std::vector<int>> latest_memory;
     void init_bus(int cache_size, int associativity, int block_size, GlobalLock *gl){
         // Step 1: initialize variables
@@ -33,13 +33,19 @@ class Bus {
 
     }
 
-    // Cache to Bus transactions
-    void BusRd(int PID, int i_set, int tag) {
+    // Cache to Bus transactions API
+    virtual void BusRd(int PID, int i_set, int tag, Cache *cache) = 0;
+    virtual void BusUpd(int PID, int i_set, int tag, Cache *cache) = 0; // BusRdX for Bus_MESI, BusUpdate for Bus_Dragon
+};
+
+class Bus_MESI : public Bus {
+    void BusRd(int PID, int i_set, int tag, Cache *cache) {
         gl->gl_lock(i_set);
 
         gl->gl_unlock(i_set);
     }
-    void BusRdX(int PID, int i_set, int tag) {
+    void BusUpd(int PID, int i_set, int tag, Cache *cache) { 
+        gl->gl_lock(i_set);
         /*
         * Step 1: Acquire lock to set index
         * Step 2: Invalidate all cache lines  
@@ -47,15 +53,29 @@ class Bus {
         */
         gl->gl_lock(i_set);
         for(int i = 0; i < num_cores; i++) {
-            // flush_cacheline(i_set, tag);
+            cache->update_cacheline(i_set, tag);
         }
-        gl->gl_unlock(i_set);
-    }
-    void BusUpd(int PID, int i_set, int tag) { 
-        gl->gl_lock(i_set);
-
         gl->gl_unlock(i_set);
     }
 };
 
+class Bus_Dragon : public Bus {
+    void BusRd(int PID, int i_set, int tag, Cache *cache) {
+        gl->gl_lock(i_set);
+
+        gl->gl_unlock(i_set);
+    }
+    void BusUpd(int PID, int i_set, int tag, Cache *cache) { 
+        gl->gl_lock(i_set);
+        /*
+        * Step 1: Acquire lock to set index
+        * Step 2: Update all caches with existing tag, change states if necessary
+        * Step 3: Release lock
+        */
+        for(int i = 0; i < num_cores; i++) {
+            cache->update_cacheline(i_set, tag);
+        }
+        gl->gl_unlock(i_set);
+    }
+};
 #endif // BUS_HPP
