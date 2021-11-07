@@ -5,6 +5,8 @@
 #include "config.hpp"
 #include "Cache.hpp"
 #include "Bus.hpp"
+#include "GlobalLock.hpp"
+
 class Processor {
 private:    
     int total_cycle = 0;
@@ -14,24 +16,29 @@ private:
 
     Cache* cache;
     Bus* bus;
+    GlobalLock* gl;
     uint32_t instr;
     uint32_t val;
     std::string str_val;
     std::stringstream ss;
-    int index_test; // PID
+    int index_test;
+    int PID;
 
 
 public:
-    void initialize(int index, protocol prot, benchmark bm, int cache_size, int associativity, int block_size, Bus *bus) {
+    void initialize(int index, protocol prot, benchmark bm, int cache_size, int associativity, int block_size, int PID, Bus *bus, GlobalLock *gl) {
+        this->bus = bus;
+        this->gl = gl;
+        this->PID = PID;
         switch (prot) {
         case protocol::MESI:
             cache = new Cache_MESI();
-            cache->set_params(cache_size, associativity, block_size);
+            cache->set_params(cache_size, associativity, block_size, PID, bus, gl);
             break;
         
         case protocol::Dragon:
             cache = new Cache_Dragon();
-            cache->set_params(cache_size, associativity, block_size);
+            cache->set_params(cache_size, associativity, block_size, PID, bus, gl);
             break;
 
         default:
@@ -66,8 +73,6 @@ public:
         M = (cache_size / block_size) / associativity;
         N = block_size;
 
-        this->bus = bus;
-
         return;
     }
 
@@ -81,7 +86,7 @@ public:
             
             if (instr == 0 || instr == 1) {
                 int set_index = (val / N) % M;
-                std::cout << "[" << set_index << "]" << std::endl;
+                // std::cout << "[" << set_index << "]" << std::endl;
                 int tag = (val / N) / M;
                 if (instr == 0) { // read
                     total_cycle += cache->pr_read(set_index, tag);

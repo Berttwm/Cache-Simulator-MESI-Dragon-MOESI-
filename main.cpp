@@ -6,6 +6,7 @@
 
 #include "utils/Processor.hpp"
 #include "utils/Bus.hpp"
+#include "utils/GlobalLock.hpp"
 
 
 
@@ -40,31 +41,22 @@ int main(int argc, char* argv[]) {
         ss << argv[5];
         ss >> block_size;
     }
+    // Initialize GlobalLock
+    GlobalLock *gl = new GlobalLock(cache_size, associativity, block_size);
 
     // Initialize Bus:
-    Bus *bus;
-    switch (curr_protocol) {
-        case protocol::MESI:
-            bus = new Bus_MESI();
-            break;
-        case protocol::Dragon:
-            bus = new Bus_Dragon();
-            break;
-        default:
-            std::cout << "[ERROR] Protocol type wrong (in bus)." << std::endl; 
-            return -1; 
-    }
-    bus->init_bus(cache_size, associativity, block_size);
+    Bus *bus = new Bus();
+    bus->init_bus(cache_size, associativity, block_size, gl);
 
     // Initialize Cores:
     Processor* core0 = new Processor();
     Processor* core1 = new Processor();
     Processor* core2 = new Processor();
     Processor* core3 = new Processor();
-    core0->initialize(0, curr_protocol, input_file, cache_size, associativity, block_size, bus);
-    core1->initialize(1, curr_protocol, input_file, cache_size, associativity, block_size, bus);
-    core2->initialize(2, curr_protocol, input_file, cache_size, associativity, block_size, bus);
-    core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size, bus);
+    core0->initialize(0, curr_protocol, input_file, cache_size, associativity, block_size, 0, bus, gl);
+    core1->initialize(1, curr_protocol, input_file, cache_size, associativity, block_size, 1, bus, gl);
+    core2->initialize(2, curr_protocol, input_file, cache_size, associativity, block_size, 2, bus, gl);
+    core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size, 3, bus, gl);
 
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);
