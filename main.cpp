@@ -69,6 +69,8 @@ int main(int argc, char* argv[]) {
     core2->initialize(2, curr_protocol, input_file, cache_size, associativity, block_size, 2, bus, gl);
     core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size, 3, bus, gl);
 
+    bus->init_cache(core0->get_cache(), core1->get_cache(), core2->get_cache(), core3->get_cache());
+
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);
     std::thread th2(&Processor::run, core2);

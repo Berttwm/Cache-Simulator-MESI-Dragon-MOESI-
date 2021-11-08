@@ -7,13 +7,14 @@
 #include "config.hpp"
 #include "GlobalLock.hpp"
 
+
 class Bus;
 
 
 // Abstract class Cache
 class Cache {
 public:
-    enum cache_line {status, tag};
+    
     int PID;
     int num_sets;
     int num_ways;
@@ -28,7 +29,7 @@ public:
     int num_access_private = 0;
     int num_access_shared = 0;
 
-    // // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
+    // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
     // 2: index 0 for states, index 1 for tag
     void set_params(int cache_size, int associativity, int blk_size, int PID, Bus *bus, GlobalLock *gl) {
         this->PID = PID;
@@ -46,12 +47,23 @@ public:
         this->bus = bus;
         this->gl = gl;
 
+    }
+
+    /*
+    ** To maintain LRU replacement policy, old data in the given cache set are shifted to left
+    */
+    void shift_cacheline(int i_set) {
+        for (int i = 0; i < num_ways-1; i++) {
+            dummy_cache[i][i_set] = dummy_cache[i+1][i_set];
+        }
     }   
 
     virtual int pr_read(int i_set, int tag) = 0;
     virtual int pr_write(int i_set, int tag) = 0;
     /* Cache to bus transactions */
     virtual void update_cacheline(int i_set, int tag) = 0;
+
+    virtual int get_status(int i_set, int tag) = 0;
         
 };
 
@@ -60,14 +72,27 @@ private:
      
 public:
     int pr_read(int i_set, int tag) {
+        int curr_op_cycle = 1;
         for (int i = 0; i < num_ways; i++) {
             // Read hit
             if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag))
-                return 1;
+                return curr_op_cycle;
         }
         // Read miss
-        // TODO: check bus then update status
-        return 1; // placeholder
+        shift_cacheline(i_set);
+        dummy_cache[num_ways-1][i_set][cache_line::tag] = tag;
+        Cache *placeholder;
+        if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
+            // I -> E
+            // Fetching a block from memory to cache takes additional 100 cycles
+            curr_op_cycle = 101;
+            dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::E_MESI;
+        } else {
+            // I -> S
+            dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::S;
+        }
+
+        return curr_op_cycle; // placeholder
     }
 
     int pr_write(int i_set, int tag) {
@@ -98,12 +123,29 @@ public:
     */
     void update_cacheline(int i_set, int tag) {
         // access to this method means cache is already locked
-        for(int i = 0; i < num_ways; i++) {
+        for (int i = 0; i < num_ways; i++) {
             if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
                 dummy_cache[i][i_set][cache_line::status] == status_MESI::I;
             }
         }
     }
+
+    int get_status(int i_set, int tag) {
+        int status = status_MESI::I;
+        for (int i = 0; i < num_ways; i++) {
+            if (dummy_cache[i][i_set][cache_line::tag] == tag) {
+                status = dummy_cache[i][i_set][cache_line::status];
+
+                // Change M/E to S (Flush)
+                if (status == status_MESI::M || status_MESI::E_MESI)
+                    dummy_cache[i][i_set][cache_line::status] = status_MESI::S;
+
+                break;
+            }
+        }
+        return status_MESI::I;
+    }
+
     
 };
 
@@ -162,6 +204,10 @@ public:
                 }
             }
         }
+    }
+
+    int get_status(int i_set, int tag) {
+        return 1; // placeholder
     }
     
 };

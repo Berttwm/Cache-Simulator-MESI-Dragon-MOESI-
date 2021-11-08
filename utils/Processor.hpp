@@ -84,6 +84,10 @@ public:
         return;
     }
 
+    Cache* get_cache() {
+        return cache;
+    }
+
     void run() {
         while(bm_file >> instr >> str_val) {
             ss.clear();

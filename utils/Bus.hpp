@@ -6,11 +6,13 @@
 #include <unordered_set>
 
 #include "GlobalLock.hpp"
+
+
 class Cache;
 
 class Bus {
-   private:
-   public:
+private:
+public:
     typedef int pid;
     const int num_cores = 4;
 
@@ -21,6 +23,9 @@ class Bus {
     int associativity;
     int offset;
     GlobalLock *gl;
+
+    std::vector<Cache*> cache_list;
+
     // // latest_memory has the view of the latest memory written - do we need this?
     // std::vector<std::vector<int>> latest_memory;
     void init_bus(int cache_size, int associativity, int block_size, GlobalLock *gl){
@@ -33,16 +38,35 @@ class Bus {
 
     }
 
+    void init_cache(Cache *c0, Cache *c1, Cache *c2, Cache *c3) {
+        cache_list.push_back(c0);
+        cache_list.push_back(c1);
+        cache_list.push_back(c2);
+        cache_list.push_back(c3);
+    }
+
     // Cache to Bus transactions API
-    virtual void BusRd(int PID, int i_set, int tag, Cache *cache) = 0;
+    virtual int BusRd(int PID, int i_set, int tag, Cache *cache) = 0;
     virtual void BusUpd(int PID, int i_set, int tag, Cache *cache) = 0; // BusRdX for Bus_MESI, BusUpdate for Bus_Dragon
 };
 
 class Bus_MESI : public Bus {
-    void BusRd(int PID, int i_set, int tag, Cache *cache) {
+public:    
+    int BusRd(int PID, int i_set, int tag, Cache *cache) {
+        int status = status_MESI::I;
         gl->gl_lock(i_set);
+        for (int i = 0; i < num_cores; i++) {
+            if (i == PID) continue;
 
+            int curr_status = cache_list[i]->get_status(i_set, tag);
+            if (curr_status != status_MESI::I) {
+                status = curr_status;
+                break;
+            }
+            if (status != status_MESI::I) break;
+        }
         gl->gl_unlock(i_set);
+        return status;
     }
     void BusUpd(int PID, int i_set, int tag, Cache *cache) { 
         gl->gl_lock(i_set);
@@ -60,10 +84,11 @@ class Bus_MESI : public Bus {
 };
 
 class Bus_Dragon : public Bus {
-    void BusRd(int PID, int i_set, int tag, Cache *cache) {
+    int BusRd(int PID, int i_set, int tag, Cache *cache) {
         gl->gl_lock(i_set);
 
         gl->gl_unlock(i_set);
+        return 1; // placeholder
     }
     void BusUpd(int PID, int i_set, int tag, Cache *cache) { 
         gl->gl_lock(i_set);
