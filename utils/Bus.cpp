@@ -49,7 +49,14 @@ void Bus_MESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
     */
     gl->gl_lock(i_set);
     for(int i = 0; i < num_cores; i++) {
-        cache->set_status_cacheline(i_set, tag, 0);
+        if (i == PID) continue;
+
+        int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
+        if (curr_status != status_MESI::I) {
+            // Invalidate all cache Lines
+            cache->set_status_cacheline(i_set, tag, status_MESI::I);
+            break;
+        }
     }
     gl->gl_unlock(i_set);
 }

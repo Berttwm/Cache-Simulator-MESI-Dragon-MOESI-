@@ -37,6 +37,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
         // Read hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // Update LRU Policy - Read Hit
+            shift_cacheline_left_until(i_set,i);
             std::vector<int> temp = dummy_cache[i][i_set];
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
 
@@ -63,27 +64,48 @@ int Cache_MESI::pr_read(int i_set, int tag) {
 }
 
 int Cache_MESI::pr_write(int i_set, int tag) {
+    int curr_op_cycle = 1;
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+            // Update LRU Policy - Write Hit
+            shift_cacheline_left_until(i_set,i);
+            std::vector<int> temp = dummy_cache[i][i_set];
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+
             switch (dummy_cache[i][i_set][cache_line::status]) {
             case status_MESI::M:
-                return 1;                
+                return curr_op_cycle;                
             case status_MESI::E_MESI:
-                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
-                // TODO: update bus (no need to update bus on write)
-                return 1;
+                return curr_op_cycle;
             case status_MESI::S:
-                // TODO: update bus on write
-                // bus->BusRdX();
-                break;
-
+                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
+                Cache *placeholder;
+                bus->BusUpd(PID, i_set, tag, placeholder);
+                return curr_op_cycle;
             }
         }
             
     }
-    // Write miss
-    return 1; // placeholder
+
+    // Write miss policy: Write-back, write-allocate
+    // Step 1: read line into cache block
+    Cache *placeholder;
+    if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
+        // I -> E
+        // Fetching a block from memory to cache takes additional 100 cycles
+        curr_op_cycle = 101;
+    }
+    // Step 2: Update LRU Policy - Write Hit
+    shift_cacheline_left_until(i_set, 0); 
+    // Step 3: Set last line to new and modified
+    dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
+    dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M; 
+    
+    // Step 3: Invalidate all other cachelines
+    bus->BusUpd(PID, i_set, tag, placeholder);
+
+    return curr_op_cycle; // placeholder
 }
 
 int Cache_MESI::get_status_cacheline(int i_set, int tag) {
