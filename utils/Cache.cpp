@@ -21,7 +21,8 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 }
 
 /*
-** To maintain LRU replacement policy, old data in the given cache set are shifted to left
+** To maintain LRU replacement policy, old data in the given cache set are shifted to left till pos
+* pos = 0 for read-miss 
 */
 
 void Cache::shift_cacheline_left_until(int i_set, int pos) {
@@ -90,19 +91,13 @@ int Cache_MESI::get_status_cacheline(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) {
             status = dummy_cache[i][i_set][cache_line::status];
-
-            // Change M/E to S (Flush)
-            if (status == status_MESI::M || status_MESI::E_MESI)
-                dummy_cache[i][i_set][cache_line::status] = status_MESI::S;
-
             break;
         }
     }
     return status;
 }
 
-int Cache_MESI::set_status_cacheline(int i_set, int tag) {
-    // access to this method means cache is already locked
+int Cache_MESI::set_status_cacheline(int i_set, int tag, int status) {
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
             dummy_cache[i][i_set][cache_line::status] == status_MESI::I;
@@ -152,7 +147,7 @@ int Cache_Dragon::get_status_cacheline(int i_set, int tag) {
 /* Cache to Bus transaction API 
 * 1) set_status_cacheline: invalidate all cacheline entries 
 */
-int Cache_Dragon::set_status_cacheline(int i_set, int tag) {
+int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status) {
     // access to this method means cache is already locked
     for(int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found

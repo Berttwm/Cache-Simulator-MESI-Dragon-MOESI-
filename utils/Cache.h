@@ -40,7 +40,7 @@ public:
     /* Cache to bus transactions */
 
     virtual int get_status_cacheline(int i_set, int tag) = 0;
-    virtual int set_status_cacheline(int i_set, int tag) = 0;
+    virtual int set_status_cacheline(int i_set, int tag, int status) = 0;
         
 };
 
@@ -50,7 +50,7 @@ public:
     int pr_read(int i_set, int tag);
     int pr_write(int i_set, int tag);
     int get_status_cacheline(int i_set, int tag);
-    int set_status_cacheline(int i_set, int tag);
+    int set_status_cacheline(int i_set, int tag, int status);
 
 };
 
@@ -60,7 +60,7 @@ public:
     int pr_read(int i_set, int tag);
     int pr_write(int i_set, int tag);
     int get_status_cacheline(int i_set, int tag);
-    int set_status_cacheline(int i_set, int tag);
+    int set_status_cacheline(int i_set, int tag, int status);
 };
 
 

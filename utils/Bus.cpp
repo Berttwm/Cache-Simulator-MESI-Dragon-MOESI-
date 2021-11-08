@@ -29,6 +29,9 @@ int Bus_MESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MESI::I) {
+            // Change M/E to S (Flush)
+            if (curr_status == status_MESI::M || status_MESI::E_MESI)
+                cache_list[i]->set_status_cacheline(i_set, tag, status_MESI::S);
             status = curr_status;
             break;
         }
@@ -46,7 +49,7 @@ void Bus_MESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
     */
     gl->gl_lock(i_set);
     for(int i = 0; i < num_cores; i++) {
-        cache->set_status_cacheline(i_set, tag);
+        cache->set_status_cacheline(i_set, tag, 0);
     }
     gl->gl_unlock(i_set);
 }
@@ -66,7 +69,7 @@ void Bus_Dragon::BusUpd(int PID, int i_set, int tag, Cache *cache) {
     * Step 3: Release lock
     */
     for(int i = 0; i < num_cores; i++) {
-        cache->set_status_cacheline(i_set, tag);
+        cache->set_status_cacheline(i_set, tag, 0);
     }
     gl->gl_unlock(i_set);
 }
