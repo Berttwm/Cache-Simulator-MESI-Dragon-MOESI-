@@ -84,7 +84,7 @@ void Processor::run() {
             }
             total_cycle += val;
         }
-        std::cout << "Total cycles: " << total_cycle << std::endl;
+        std::cout << "[" << PID << "] " << "Total cycles: " << total_cycle << std::endl;
     }     
     return; 
 }

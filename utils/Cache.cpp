@@ -34,13 +34,13 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Read hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
-            std::cout << "Read Hit" << std::endl;
+            std::cout << "[" << PID << "] " << "Read Hit" << std::endl;
             return curr_op_cycle;
         }
             
     }
     // Read miss
-    std::cout << "Read Miss" << std::endl;
+    std::cout << "[" << PID << "] " << "Read Miss" << std::endl;
     shift_cacheline(i_set);
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag;
     Cache *placeholder;
@@ -49,9 +49,11 @@ int Cache_MESI::pr_read(int i_set, int tag) {
         // Fetching a block from memory to cache takes additional 100 cycles
         curr_op_cycle = 101;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::E_MESI;
+        std::cout << "[" << PID << "] " << "Read from main memory" << std::endl;
     } else {
         // I -> S
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::S;
+        std::cout << "[" << PID << "] " << "Read from other caches" << std::endl;
     }
 
     return curr_op_cycle; // placeholder
@@ -91,6 +93,7 @@ void Cache_MESI::update_cacheline(int i_set, int tag) {
 }
 
 int Cache_MESI::get_status(int i_set, int tag) {
+    std::cout << "[" << PID << "] " << "Looking for address" << std::endl;
     int status = status_MESI::I;
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) {
@@ -103,7 +106,7 @@ int Cache_MESI::get_status(int i_set, int tag) {
             break;
         }
     }
-    return status_MESI::I;
+    return status;
 }
 
 
