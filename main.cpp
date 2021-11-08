@@ -4,8 +4,8 @@
 
 #include <string.h>
 
-#include "utils/Processor.hpp"
-#include "utils/Bus.hpp"
+#include "utils/Processor.h"
+#include "utils/Bus.h"
 #include "utils/GlobalLock.hpp"
 
 
