@@ -9,7 +9,7 @@
 
 class Processor {
 private:    
-    int total_cycle = 0;
+    
     std::ifstream bm_file;
     int N = 1; // offset size
     int M = 1; // number of sets
@@ -23,6 +23,14 @@ private:
     std::stringstream ss;
     int index_test;
     int PID;
+
+    // Statistics
+    int total_cycle = 0;
+    int compute_cycle = 0;
+    int num_mem_instr = 0; // Number of load/store instructions
+    int idle_cycle = 0;
+    
+
 
 
 public:
@@ -71,7 +79,7 @@ public:
             return;
         }
         M = (cache_size / block_size) / associativity;
-        N = block_size;
+        N = block_size / 4;
 
         return;
     }

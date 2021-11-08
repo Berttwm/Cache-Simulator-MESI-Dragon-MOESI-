@@ -20,6 +20,14 @@ public:
     Bus *bus;
     GlobalLock *gl;
     std::vector<std::vector<std::vector<int>>> dummy_cache;
+
+    // Statistics
+    int num_cache_miss = 0;
+    int num_data_traffic = 0;
+    int num_update = 0;
+    int num_access_private = 0;
+    int num_access_shared = 0;
+
     // // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
     // 2: index 0 for states, index 1 for tag
     void set_params(int cache_size, int associativity, int blk_size, int PID, Bus *bus, GlobalLock *gl) {
