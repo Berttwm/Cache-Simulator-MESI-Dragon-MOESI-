@@ -23,8 +23,9 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 /*
 ** To maintain LRU replacement policy, old data in the given cache set are shifted to left
 */
-void Cache::shift_cacheline(int i_set) {
-    for (int i = 0; i < num_ways-1; i++) {
+
+void Cache::shift_cacheline_left_until(int i_set, int pos) {
+    for (int i = pos; i < num_ways-1; i++) { 
         dummy_cache[i][i_set] = dummy_cache[i+1][i_set];
     }
 }
@@ -33,12 +34,19 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     int curr_op_cycle = 1;
     for (int i = 0; i < num_ways; i++) {
         // Read hit
-        if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag))
+        if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+            // Update LRU Policy - Read Hit
+            std::vector<int> temp = dummy_cache[i][i_set];
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+
             return curr_op_cycle;
+        }
     }
     // Read miss
-    shift_cacheline(i_set);
-    dummy_cache[num_ways-1][i_set][cache_line::tag] = tag;
+    // Update LRU Policy - Read miss
+    shift_cacheline_left_until(i_set, 0); 
+    dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
+
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // I -> E
@@ -77,16 +85,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     return 1; // placeholder
 }
 
-void Cache_MESI::update_cacheline(int i_set, int tag) {
-    // access to this method means cache is already locked
-    for (int i = 0; i < num_ways; i++) {
-        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
-            dummy_cache[i][i_set][cache_line::status] == status_MESI::I;
-        }
-    }
-}
-
-int Cache_MESI::get_status(int i_set, int tag) {
+int Cache_MESI::get_status_cacheline(int i_set, int tag) {
     int status = status_MESI::I;
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) {
@@ -102,6 +101,16 @@ int Cache_MESI::get_status(int i_set, int tag) {
     return status;
 }
 
+int Cache_MESI::set_status_cacheline(int i_set, int tag) {
+    // access to this method means cache is already locked
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
+            dummy_cache[i][i_set][cache_line::status] == status_MESI::I;
+        }
+    }
+
+    return 1; // placeholder
+}
 
 int Cache_Dragon::pr_read(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
@@ -136,11 +145,14 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
     return 1;
 }
 
-
+int Cache_Dragon::get_status_cacheline(int i_set, int tag) {
+    return 1; // placeholder
+}
+    
 /* Cache to Bus transaction API 
-* 1) update_cacheline: invalidate all cacheline entries 
+* 1) set_status_cacheline: invalidate all cacheline entries 
 */
-void Cache_Dragon::update_cacheline(int i_set, int tag) {
+int Cache_Dragon::set_status_cacheline(int i_set, int tag) {
     // access to this method means cache is already locked
     for(int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
@@ -158,9 +170,5 @@ void Cache_Dragon::update_cacheline(int i_set, int tag) {
             }
         }
     }
-}
-
-int Cache_Dragon::get_status(int i_set, int tag) {
     return 1; // placeholder
 }
-    
