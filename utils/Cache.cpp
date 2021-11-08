@@ -99,7 +99,7 @@ int Cache_MESI::get_status(int i_set, int tag) {
             break;
         }
     }
-    return status_MESI::I;
+    return status;
 }
 
 
