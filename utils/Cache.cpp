@@ -68,22 +68,24 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
-            // Update LRU Policy - Write Hit
-            shift_cacheline_left_until(i_set,i);
-            std::vector<int> temp = dummy_cache[i][i_set];
-            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
 
             switch (dummy_cache[i][i_set][cache_line::status]) {
             case status_MESI::M:
-                return curr_op_cycle;                
+                break;
             case status_MESI::E_MESI:
-                return curr_op_cycle;
+                break;
             case status_MESI::S:
                 dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
                 Cache *placeholder;
                 bus->BusUpd(PID, i_set, tag, placeholder);
-                return curr_op_cycle;
+                break;
             }
+            
+            // Update LRU Policy - Write Hit
+            shift_cacheline_left_until(i_set,i);
+            std::vector<int> temp = dummy_cache[i][i_set];
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+            return curr_op_cycle;
         }
             
     }
@@ -92,9 +94,11 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     // Step 1: read line into cache block
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
-        // I -> E
         // Fetching a block from memory to cache takes additional 100 cycles
         curr_op_cycle = 101;
+    } else {
+        // Fetching a block from another cache to mine takes 2 cycles
+        curr_op_cycle += 2;
     }
     // Step 2: Update LRU Policy - Write Hit
     shift_cacheline_left_until(i_set, 0); 
@@ -122,7 +126,8 @@ int Cache_MESI::get_status_cacheline(int i_set, int tag) {
 int Cache_MESI::set_status_cacheline(int i_set, int tag, int status) {
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
-            dummy_cache[i][i_set][cache_line::status] == status_MESI::I;
+            dummy_cache[i][i_set][cache_line::status] = status;
+            break;
         }
     }
 
