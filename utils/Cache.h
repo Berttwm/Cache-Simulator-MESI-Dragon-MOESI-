@@ -30,15 +30,17 @@ public:
 
     /*
     ** To maintain LRU replacement policy, old data in the given cache set are shifted to left
+    * 
     */
-    void shift_cacheline(int i_set);   
+    void shift_cacheline_left(int i_set);
+    void shift_cacheline_left_until(int i_set, int pos);
 
     virtual int pr_read(int i_set, int tag) = 0;
     virtual int pr_write(int i_set, int tag) = 0;
     /* Cache to bus transactions */
-    virtual void update_cacheline(int i_set, int tag) = 0;
 
-    virtual int get_status(int i_set, int tag) = 0;
+    virtual int get_status_cacheline(int i_set, int tag) = 0;
+    virtual int set_status_cacheline(int i_set, int tag, int status) = 0;
         
 };
 
@@ -47,8 +49,8 @@ private:
 public:
     int pr_read(int i_set, int tag);
     int pr_write(int i_set, int tag);
-    void update_cacheline(int i_set, int tag);
-    int get_status(int i_set, int tag);
+    int get_status_cacheline(int i_set, int tag);
+    int set_status_cacheline(int i_set, int tag, int status);
 
 };
 
@@ -57,8 +59,8 @@ private:
 public:
     int pr_read(int i_set, int tag);
     int pr_write(int i_set, int tag);
-    void update_cacheline(int i_set, int tag);
-    int get_status(int i_set, int tag);
+    int get_status_cacheline(int i_set, int tag);
+    int set_status_cacheline(int i_set, int tag, int status);
 };
 
 
