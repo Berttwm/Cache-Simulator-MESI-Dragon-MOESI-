@@ -2,7 +2,8 @@
 #include <sstream>
 #include <thread>
 
-#include <string.h>
+#include <cstring>
+#include <string>
 
 #include "utils/Processor.h"
 #include "utils/Bus.h"
@@ -18,6 +19,8 @@ int main(int argc, char* argv[]) {
     int cache_size = 4096; // value in bytes
     int associativity = 2;
     int block_size = 32; // value in bytes
+    std::stringstream ss;
+    std::string input_info;
 
     if (argc < 6) {
         std::cout << "[ERROR] Only " << argc << " arguments in command line, need 5 arguments." << std::endl;
@@ -32,7 +35,7 @@ int main(int argc, char* argv[]) {
         else if (strcmp(argv[2],"fluidanimate") == 0) input_file = benchmark::fluidanimate;
         else std::cout << "[ERROR] Wrong benchmark. Only blackscholes, bodytrack and fluidanimate are supported. " << std::endl; 
         
-        std::stringstream ss;
+        ss.clear();
         ss << argv[3];
         ss >> cache_size;
         ss.clear();
@@ -41,6 +44,19 @@ int main(int argc, char* argv[]) {
         ss.clear();
         ss << argv[5];
         ss >> block_size;
+
+        
+        std::string temp;
+        for (int i = 1; i < 6; i++) {
+            ss.clear();
+            ss << argv[i];
+            ss >> temp;
+            if (i == 1) {
+                input_info = temp;
+            } else {
+                input_info = input_info + "_" + temp;
+            }
+        }
     }
     // Initialize GlobalLock
     GlobalLock *gl = new GlobalLock(cache_size, associativity, block_size);
@@ -73,7 +89,7 @@ int main(int argc, char* argv[]) {
     core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size, 3, bus, gl);
 
     bus->init_cache(core0->get_cache(), core1->get_cache(), core2->get_cache(), core3->get_cache());
-    log_generator->initialize(core0, core1, core2, core3);
+    log_generator->initialize(core0, core1, core2, core3, input_info);
 
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);
