@@ -13,6 +13,7 @@ private:
     std::vector<Processor*> core_list;
     std::vector<Cache*> cache_list;
     std::string output_path = "logs/";
+    int NUM_OF_CORES = 4;
 public:
     void initialize(Processor* core0, Processor* core1, Processor* core2, Processor* core3, std::string input_info) {
         core_list.push_back(core0);
@@ -44,8 +45,29 @@ public:
 
     }
 
+    void print_compute_cycles() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "2. Number of compute cycles per core" << std::endl;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            int curr_val = core_list[i]->get_compute_cycle();
+            output_log << "Core " << i << ": " << curr_val << std::endl;
+        }
+    }
+
+    void print_num_mem_instr() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "3. Number of load/store instructions per core" << std::endl;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            int curr_val = core_list[i]->get_num_mem_instr();
+            output_log << "Core " << i << ": " << curr_val << std::endl;
+        }
+    }
+
     void print_summary() {
 
+
+        print_compute_cycles();
+        print_num_mem_instr();
 
         output_log << "============== END OF LOG ==============" << std::endl;
         output_log << "========================================" << std::endl;

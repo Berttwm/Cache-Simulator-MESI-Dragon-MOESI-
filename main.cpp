@@ -100,6 +100,8 @@ int main(int argc, char* argv[]) {
     th1.join();
     th2.join();
     th3.join();
+
+    log_generator->print_summary();
     
 
     return 0;

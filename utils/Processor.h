@@ -30,6 +30,8 @@ public:
     void initialize(int index, protocol prot, benchmark bm, int cache_size, int associativity, int block_size, int PID, Bus *bus, GlobalLock *gl);
     Cache* get_cache();
     void run();
+    int get_compute_cycle();
+    int get_num_mem_instr();
 
 };
 

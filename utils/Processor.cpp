@@ -57,6 +57,14 @@ Cache* Processor::get_cache() {
     return cache;
 }
 
+int Processor::get_compute_cycle() {
+    return compute_cycle;
+}
+
+int Processor::get_num_mem_instr() {
+    return num_mem_instr;
+}
+
 void Processor::run() {
     std::string str_val;
     while(bm_file >> instr >> str_val) {
@@ -67,6 +75,7 @@ void Processor::run() {
         // std::cout << "[" << index_test << "]  " << instr << " | " << val << std::endl;
         
         if (instr == 0 || instr == 1) {
+            num_mem_instr += 1;
             int set_index = (val / N) % M;
             // std::cout << "[" << set_index << "]" << std::endl;
             int tag = (val / N) / M;
@@ -80,6 +89,7 @@ void Processor::run() {
                 std::cout << "[ERROR] Instr index value goes out of range." << std::endl;
                 return;
             }
+            compute_cycle += val;
             total_cycle += val;
         }
     }     
