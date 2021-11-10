@@ -73,6 +73,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
             case status_MESI::M:
                 break;
             case status_MESI::E_MESI:
+                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
                 break;
             case status_MESI::S:
                 dummy_cache[i][i_set][cache_line::status] = status_MESI::M;

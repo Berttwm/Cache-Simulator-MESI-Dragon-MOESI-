@@ -20,9 +20,9 @@ public:
     // Statistics
     int num_cache_miss = 0;
     int num_data_traffic = 0;
-    int num_update = 0;
-    int num_access_private = 0;
-    int num_access_shared = 0;
+    int num_update = 0; // Number of invalidations or updates on the bus
+    int num_access_private = 0; // Access to modified state is private
+    int num_access_shared = 0; // Access to shared state is shared
 
     // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
     // 2: index 0 for states, index 1 for tag

@@ -48,7 +48,7 @@ void Processor::initialize(int index, protocol prot, benchmark bm, int cache_siz
         return;
     }
     M = (cache_size / block_size) / associativity;
-    N = block_size / 4;
+    N = block_size;
 
     return;
 }
