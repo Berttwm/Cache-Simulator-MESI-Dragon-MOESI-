@@ -24,13 +24,16 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 ** To maintain LRU replacement policy, old data in the given cache set are shifted to left till pos
 * pos = 0 for read-miss 
 */
-
 void Cache::shift_cacheline_left_until(int i_set, int pos) {
     for (int i = pos; i < num_ways-1; i++) { 
         dummy_cache[i][i_set] = dummy_cache[i+1][i_set];
     }
 }
-
+/* 
+***************************************************************
+MESI Cache Protocol APIs
+***************************************************************
+*/
 int Cache_MESI::pr_read(int i_set, int tag) {
     int curr_op_cycle = 1;
     for (int i = 0; i < num_ways; i++) {
@@ -53,10 +56,13 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // I -> E
         // Fetching a block from memory to cache takes additional 100 cycles
-        curr_op_cycle = 101;
+        curr_op_cycle += 100;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::E_MESI;
     } else {
         // I -> S
+        // Fetching a block from other cache to my cache takes additional 2 cycles
+
+        curr_op_cycle += 2;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::S;
     }
 
@@ -81,7 +87,6 @@ int Cache_MESI::pr_write(int i_set, int tag) {
                 bus->BusUpd(PID, i_set, tag, placeholder);
                 break;
             }
-            
             // Update LRU Policy - Write Hit
             shift_cacheline_left_until(i_set,i);
             std::vector<int> temp = dummy_cache[i][i_set];
@@ -96,7 +101,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // Fetching a block from memory to cache takes additional 100 cycles
-        curr_op_cycle = 101;
+        curr_op_cycle += 100;
     } else {
         // Fetching a block from another cache to mine takes 2 cycles
         curr_op_cycle += 2;
@@ -135,6 +140,11 @@ int Cache_MESI::set_status_cacheline(int i_set, int tag, int status) {
     return 1; // placeholder
 }
 
+/* 
+***************************************************************
+Dragon Cache Protocol APIs
+***************************************************************
+*/
 int Cache_Dragon::pr_read(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Read hit
