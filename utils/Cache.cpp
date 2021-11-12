@@ -36,14 +36,15 @@ MESI Cache Protocol APIs
 */
 int Cache_MESI::pr_read(int i_set, int tag) {
     int curr_op_cycle = 1;
+    gl->gl_lock(i_set);
     for (int i = 0; i < num_ways; i++) {
         // Read hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // Update LRU Policy - Read Hit
-            shift_cacheline_left_until(i_set,i);
             std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
-
+            gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
     }
@@ -65,12 +66,13 @@ int Cache_MESI::pr_read(int i_set, int tag) {
         curr_op_cycle += 2;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::S;
     }
-
+    gl->gl_unlock(i_set);
     return curr_op_cycle; // placeholder
 }
 
 int Cache_MESI::pr_write(int i_set, int tag) {
     int curr_op_cycle = 1;
+    gl->gl_lock(i_set);
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
@@ -88,14 +90,14 @@ int Cache_MESI::pr_write(int i_set, int tag) {
                 break;
             }
             // Update LRU Policy - Write Hit
-            shift_cacheline_left_until(i_set,i);
             std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+            gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
             
     }
-
     // Write miss policy: Write-back, write-allocate
     // Step 1: read line into cache block
     Cache *placeholder;
@@ -106,7 +108,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         // Fetching a block from another cache to mine takes 2 cycles
         curr_op_cycle += 2;
     }
-    // Step 2: Update LRU Policy - Write Hit
+    // Step 2: Update LRU Policy - Write Miss
     shift_cacheline_left_until(i_set, 0); 
     // Step 3: Set last line to new and modified
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
@@ -114,7 +116,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     
     // Step 3: Invalidate all other cachelines
     bus->BusUpd(PID, i_set, tag, placeholder);
-
+    gl->gl_unlock(i_set);
     return curr_op_cycle; // placeholder
 }
 
@@ -126,17 +128,17 @@ int Cache_MESI::get_status_cacheline(int i_set, int tag) {
             break;
         }
     }
+    // gl->gl_unlock(i_set);
     return status;
 }
 
-int Cache_MESI::set_status_cacheline(int i_set, int tag, int status) {
+int Cache_MESI::set_status_cacheline(int i_set, int tag, int status, int op) {
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
             dummy_cache[i][i_set][cache_line::status] = status;
             break;
         }
     }
-
     return 1; // placeholder
 }
 
@@ -146,61 +148,128 @@ Dragon Cache Protocol APIs
 ***************************************************************
 */
 int Cache_Dragon::pr_read(int i_set, int tag) {
+    int curr_op_cycle = 1;
+    gl->gl_lock(i_set);
+
     for (int i = 0; i < num_ways; i++) {
         // Read hit
-        if ((dummy_cache[i][i_set][cache_line::status] != 0) && (dummy_cache[i][i_set][cache_line::tag] == tag))
-            return 1;
+        if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+            // Update LRU Policy - Read hit
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+            gl->gl_unlock(i_set);
+            return curr_op_cycle;
+        }
     }
     // Read miss
-    return 1; // placeholder
+    // Update LRU Policy - Read miss
+    shift_cacheline_left_until(i_set, 0); 
+    dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
+
+    Cache *placeholder;
+    if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
+        // not_found -> E
+        // Fetching a block from memory to cache takes additional 100 cycles
+        curr_op_cycle += 100;
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::E_DRAGON;
+    } else {
+        // not_found -> Sc
+        // Fetching a block from other cache to my cache takes additional 2 cycles
+        curr_op_cycle += 2;
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sc;
+    }
+    gl->gl_unlock(i_set);
+    return curr_op_cycle; // placeholder
 }
 
 int Cache_Dragon::pr_write(int i_set, int tag) {
+    int curr_op_cycle = 1;
+    Cache *placeholder;
+    gl->gl_lock(i_set);
+
     for (int i = 0; i < num_ways; i++) {
         // Write hit
-        if ((dummy_cache[i][i_set][cache_line::status] != 0) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+        if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             switch (dummy_cache[i][i_set][cache_line::status]) {
             case status_Dragon::E_DRAGON:
                 // TODO
+                dummy_cache[i][i_set][cache_line::status] = status_Dragon::D;
                 break;
             case status_Dragon::Sc:
-                // TODO update other caches thru bus
-                break;
+                // Same as Sm
             case status_Dragon::Sm:
-                // TODO: update other caches thru bus
+                if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
+                    // not found in other cache
+                    dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::D;
+                } else {
+                    // found in other cache
+                    // Each write to another cache block incurs 2 cycles
+                    curr_op_cycle += bus->BusUpd(PID, i_set, tag, placeholder);
+                    dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sm;
+                }
+                break;
             case status_Dragon::D:
-                return 1;
+                break;
             }
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
+            gl->gl_unlock(i_set);
+            return curr_op_cycle;
         }
         
     }
-    // TODO: handle the case when the block not in cache
-    return 1;
+    // Write-Miss 
+    // Step 1: Update LRU Policy - Write Hit
+    shift_cacheline_left_until(i_set, 0); 
+    if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
+        // Fetching a block from memory to cache 
+        // Step 2: Set last line to new and modified
+        dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::D; 
+
+        curr_op_cycle += 100; // read from memory operation
+    } else {
+        // Fetching a block from another cache to mine takes 2 cycles
+        // curr_op_cycle += 2;
+        // Step 2: Set last line to new and modified
+        dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sm; 
+
+        curr_op_cycle += 2; // read from other cache lines first
+
+        // Step 3: then update all included cache lines
+        curr_op_cycle += bus->BusUpd(PID, i_set, tag, placeholder);
+    }
+
+    gl->gl_unlock(i_set);
+    return curr_op_cycle; // placeholder    // TODO: handle the case when the block not in cache
 }
 
 int Cache_Dragon::get_status_cacheline(int i_set, int tag) {
-    return 1; // placeholder
+    int status = status_Dragon::not_found;
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) {
+            status = dummy_cache[i][i_set][cache_line::status];
+            break;
+        }
+    }
+    return status;
 }
     
-/* Cache to Bus transaction API 
-* 1) set_status_cacheline: invalidate all cacheline entries 
-*/
-int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status) {
-    // access to this method means cache is already locked
-    for(int i = 0; i < num_ways; i++) {
-        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
-            switch (dummy_cache[i][i_set][cache_line::status]) {
-            case status_Dragon::E_DRAGON:
-                // This case should not be possible 
-                break;
-            case status_Dragon::Sc:
-                break;
-            case status_Dragon::Sm:
-                // This case should not be possible 
-                break;
-            case status_Dragon::D:
-                break;
+int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status, int op) {
+
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) {
+            dummy_cache[i][i_set][cache_line::status] = status;
+            if(op == op_type::write_op) {
+                // Update LRU policy of other cache if set_status is a write for Dragon protocol
+                std::vector<int> temp = dummy_cache[i][i_set];
+                shift_cacheline_left_until(i_set,i);
+                dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             }
+            break;
         }
     }
     return 1; // placeholder

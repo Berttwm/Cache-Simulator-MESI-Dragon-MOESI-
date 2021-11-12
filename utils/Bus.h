@@ -4,12 +4,14 @@
 #include <vector>
 
 #include "GlobalLock.hpp"
+#include "config.hpp"
 
 
 class Cache;
 
 class Bus {
 private:
+
 public:
     typedef int pid;
     const int num_cores = 4;
@@ -26,17 +28,17 @@ public:
 
     // Cache to Bus transactions API
     virtual int BusRd(int PID, int i_set, int tag, Cache *cache) = 0;
-    virtual void BusUpd(int PID, int i_set, int tag, Cache *cache) = 0; // BusRdX for Bus_MESI, BusUpdate for Bus_Dragon
+    virtual int BusUpd(int PID, int i_set, int tag, Cache *cache) = 0; // BusRdX for Bus_MESI, BusUpdate for Bus_Dragon
 };
 
 class Bus_MESI : public Bus {
     int BusRd(int PID, int i_set, int tag, Cache *cache);
-    void BusUpd(int PID, int i_set, int tag, Cache *cache);
+    int BusUpd(int PID, int i_set, int tag, Cache *cache);
 };
 
 class Bus_Dragon : public Bus {
     int BusRd(int PID, int i_set, int tag, Cache *cache);
-    void BusUpd(int PID, int i_set, int tag, Cache *cache);
+    int BusUpd(int PID, int i_set, int tag, Cache *cache);
 };
 
 #endif

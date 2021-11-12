@@ -28,14 +28,15 @@ class GlobalLock {
         if(idx < 0 || idx > this->num_blocks) { // error input
             std::cout << "[ERROR] Global locks: trying to acquire lock that is not within range." << std::endl;
         } else {
-
+            mutexes[idx].lock();
         }
     }
     void gl_unlock(int idx) {
         if(idx < 0 || idx > this->num_blocks) { // error input
             std::cout << "[ERROR] Global locks: trying to release lock that is not within range." << std::endl;
         } else {
-            
+            mutexes[idx].unlock();
+
         }
     }
 };
