@@ -32,6 +32,10 @@ public:
     void run();
     int get_compute_cycle();
     int get_num_mem_instr();
+    int get_idle_cycle();
+    int get_num_cache_miss();
+    int get_num_access_private();
+    int get_num_access_shared();
 
 };
 

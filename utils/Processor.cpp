@@ -65,6 +65,22 @@ int Processor::get_num_mem_instr() {
     return num_mem_instr;
 }
 
+int Processor::get_idle_cycle() {
+    return idle_cycle;
+}
+
+int Processor::get_num_cache_miss() {
+    return cache->num_cache_miss;
+}
+
+int Processor::get_num_access_private() {
+    return cache->num_access_private;
+}
+
+int Processor::get_num_access_shared() {
+    return cache->num_access_shared;
+}
+
 void Processor::run() {
     std::string str_val;
     while(bm_file >> instr >> str_val) {
@@ -77,13 +93,14 @@ void Processor::run() {
         if (instr == 0 || instr == 1) {
             num_mem_instr += 1;
             int set_index = (val / N) % M;
-            std::cout << "[" << set_index << "]" << std::endl;
+            // std::cout << "[" << set_index << "]" << std::endl;
             int tag = (val / N) / M;
             if (instr == 0) { // read
-                total_cycle += cache->pr_read(set_index, tag);
+                idle_cycle += cache->pr_read(set_index, tag);      
             } else { // write
-                total_cycle += cache->pr_write(set_index, tag);
+                idle_cycle += cache->pr_write(set_index, tag);
             }
+            total_cycle += idle_cycle;
         } else {
             if (instr != 2) {
                 std::cout << "[ERROR] Instr index value goes out of range." << std::endl;

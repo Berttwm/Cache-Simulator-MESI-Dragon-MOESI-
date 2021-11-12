@@ -8,7 +8,7 @@ void Bus::init_bus(int cache_size, int associativity, int block_size, GlobalLock
     this->associativity = associativity;
     this->offset = block_size;
     this->gl = gl;
-    std::cout << "Bus initialized" << std::endl;
+    std::cout << "[INFO] Bus initialized" << std::endl;
 
 }
 

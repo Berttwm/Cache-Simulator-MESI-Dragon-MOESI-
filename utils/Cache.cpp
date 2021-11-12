@@ -44,6 +44,17 @@ int Cache_MESI::pr_read(int i_set, int tag) {
             std::vector<int> temp = dummy_cache[i][i_set];
             shift_cacheline_left_until(i_set,i);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+            // check the type of access
+            switch (dummy_cache[i][i_set][cache_line::status]) {
+            case status_MESI::M:
+            case status_MESI::E_MESI:
+                num_access_private += 1;
+                break;           
+            case status_MESI::S:
+                num_access_shared += 1;
+                break;
+            }
+
             gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
@@ -52,17 +63,18 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     // Update LRU Policy - Read miss
     shift_cacheline_left_until(i_set, 0); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
-
+    num_cache_miss += 1;
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // I -> E
         // Fetching a block from memory to cache takes additional 100 cycles
+        num_access_private += 1;
         curr_op_cycle += 100;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::E_MESI;
     } else {
         // I -> S
         // Fetching a block from other cache to my cache takes additional 2 cycles
-
+        num_access_shared += 1;
         curr_op_cycle += 2;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::S;
     }
@@ -79,11 +91,14 @@ int Cache_MESI::pr_write(int i_set, int tag) {
 
             switch (dummy_cache[i][i_set][cache_line::status]) {
             case status_MESI::M:
+                num_access_private += 1;
                 break;
             case status_MESI::E_MESI:
+                num_access_private += 1;
                 dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
                 break;
             case status_MESI::S:
+                num_access_shared += 1;
                 dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
                 Cache *placeholder;
                 bus->BusUpd(PID, i_set, tag, placeholder);
@@ -100,12 +115,15 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     }
     // Write miss policy: Write-back, write-allocate
     // Step 1: read line into cache block
+    num_cache_miss += 1;
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // Fetching a block from memory to cache takes additional 100 cycles
+        num_access_private += 1;
         curr_op_cycle += 100;
     } else {
         // Fetching a block from another cache to mine takes 2 cycles
+        num_access_shared += 1;
         curr_op_cycle += 2;
     }
     // Step 2: Update LRU Policy - Write Miss

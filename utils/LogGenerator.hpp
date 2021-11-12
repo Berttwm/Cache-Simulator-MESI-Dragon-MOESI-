@@ -40,7 +40,7 @@ public:
         output_path = output_path + "_" + index + ".log";
         output_log.open(output_path, std::ios::out);
 
-        output_log << "Outputs with inputs: " << input_info << std::endl;
+        output_log << "Output Summary with Inputs: " << input_info << std::endl;
         output_log << "========================================" << std::endl;
 
     }
@@ -63,15 +63,52 @@ public:
         }
     }
 
+    void print_num_idle_cycle() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "4. Number of idle cycles per core" << std::endl;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            int curr_val = core_list[i]->get_idle_cycle();
+            output_log << "Core " << i << ": " << curr_val << std::endl;
+        }
+    }
+
+    void print_cache_miss_rate() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "5. Data cache miss rate for each core" << std::endl;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            int num_miss = core_list[i]->get_num_cache_miss();
+            int num_instr = core_list[i]->get_num_mem_instr();
+            output_log << "Core " << i << ": " << num_miss/double(num_instr) << std::endl;
+        }
+    }
+
+    void print_distribution_of_access() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "8. Distribution of accesses to private data versus shared data" << std::endl;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            int num_private = core_list[i]->get_num_cache_miss();
+            int num_shared = core_list[i]->get_num_mem_instr();
+            output_log << "Core " << i << ": Number of access to private data = " << num_private 
+                        << " | Number of access to shared data = " << num_shared << std::endl;
+        }
+
+    }
+
     void print_summary() {
 
 
         print_compute_cycles();
         print_num_mem_instr();
+        print_num_idle_cycle();
+        print_cache_miss_rate();
+
+        print_distribution_of_access();
 
         output_log << "============== END OF LOG ==============" << std::endl;
         output_log << "========================================" << std::endl;
         output_log.close();
+
+        std::cout << "[INFO] The output summary can be found at: " << output_path << std::endl;
     }
 
 
