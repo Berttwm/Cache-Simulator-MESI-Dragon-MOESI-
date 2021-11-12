@@ -14,15 +14,21 @@ Core 2: 117698
 Core 3: 3324919
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 41493984
-Core 1: 40898420
-Core 2: 1856006
-Core 3: 42445889
+Core 0: 41570044
+Core 1: 40705658
+Core 2: 1852964
+Core 3: 42251757
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.129752
-Core 1: 0.126946
-Core 2: 0.171039
-Core 3: 0.130934
+Core 0: 0.129754
+Core 1: 0.126947
+Core 2: 0.171022
+Core 3: 0.130935
+------------------------------
+8. Distribution of accesses to private data versus shared data
+Core 0: Number of access to private data = 2965852 | Number of access to shared data = 304280
+Core 1: Number of access to private data = 2965939 | Number of access to shared data = 321313
+Core 2: Number of access to private data = 96977 | Number of access to shared data = 20721
+Core 3: Number of access to private data = 2987863 | Number of access to shared data = 337056
 ============== END OF LOG ==============
 ========================================

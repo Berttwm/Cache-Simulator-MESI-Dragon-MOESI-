@@ -86,8 +86,8 @@ public:
         output_log << "------------------------------" << std::endl;
         output_log << "8. Distribution of accesses to private data versus shared data" << std::endl;
         for (int i = 0; i < NUM_OF_CORES; i++) {
-            int num_private = core_list[i]->get_num_cache_miss();
-            int num_shared = core_list[i]->get_num_mem_instr();
+            int num_private = core_list[i]->get_num_access_private();
+            int num_shared = core_list[i]->get_num_access_shared();
             output_log << "Core " << i << ": Number of access to private data = " << num_private 
                         << " | Number of access to shared data = " << num_shared << std::endl;
         }
