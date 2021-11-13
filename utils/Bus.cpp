@@ -42,17 +42,19 @@ int Bus_MESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
 }
 
 int Bus_MESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
-    // number of cycles for BusRdX should be 0  
+    // number of cycles for BusRdX should be 0
+    int num_invalidation = 0;  
     for(int i = 0; i < num_cores; i++) {
         if (i == PID) continue;
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MESI::I) {
             // Invalidate all cache Lines
+            num_invalidation += 1;
             cache_list[i]->set_status_cacheline(i_set, tag, status_MESI::I, op_type::write_op);
         }
     }
-    return 0; // result not used for MESI bus
+    return num_invalidation; // result not used for MESI bus
 }
 
 /* 

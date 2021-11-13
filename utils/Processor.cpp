@@ -57,6 +57,10 @@ Cache* Processor::get_cache() {
     return cache;
 }
 
+long Processor::get_total_cycle() {
+    return total_cycle;
+}
+
 int Processor::get_compute_cycle() {
     return compute_cycle;
 }
@@ -71,6 +75,14 @@ int Processor::get_idle_cycle() {
 
 int Processor::get_num_cache_miss() {
     return cache->num_cache_miss;
+}
+
+int Processor::get_num_data_traffic() {
+    return cache->num_data_traffic;
+}
+
+int Processor::get_num_update() {
+    return cache->num_update;
 }
 
 int Processor::get_num_access_private() {

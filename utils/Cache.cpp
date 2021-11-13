@@ -25,9 +25,13 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 * pos = 0 for read-miss 
 */
 void Cache::shift_cacheline_left_until(int i_set, int pos) {
+    // If flush back occurs, 
+    if (pos == 0 && dummy_cache[0][i_set][cache_line::status] == M) {
+        num_data_traffic += 1;
+    }
     for (int i = pos; i < num_ways-1; i++) { 
         dummy_cache[i][i_set] = dummy_cache[i+1][i_set];
-    }
+    }   
 }
 /* 
 ***************************************************************
@@ -64,6 +68,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     shift_cacheline_left_until(i_set, 0); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
     num_cache_miss += 1;
+    num_data_traffic += 1;
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // I -> E
@@ -71,6 +76,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
         num_access_private += 1;
         curr_op_cycle += 100;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::E_MESI;
+        
     } else {
         // I -> S
         // Fetching a block from other cache to my cache takes additional 2 cycles
@@ -101,7 +107,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
                 num_access_shared += 1;
                 dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
                 Cache *placeholder;
-                bus->BusUpd(PID, i_set, tag, placeholder);
+                num_update += bus->BusUpd(PID, i_set, tag, placeholder);
                 break;
             }
             // Update LRU Policy - Write Hit
@@ -116,6 +122,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     // Write miss policy: Write-back, write-allocate
     // Step 1: read line into cache block
     num_cache_miss += 1;
+    num_data_traffic += 1;
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // Fetching a block from memory to cache takes additional 100 cycles
@@ -123,6 +130,8 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         curr_op_cycle += 100;
     } else {
         // Fetching a block from another cache to mine takes 2 cycles
+        // Invalidate the block in other caches
+        num_update += bus->BusUpd(PID, i_set, tag, placeholder);
         num_access_shared += 1;
         curr_op_cycle += 2;
     }

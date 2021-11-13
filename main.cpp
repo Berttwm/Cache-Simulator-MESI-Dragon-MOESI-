@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
     core3->initialize(3, curr_protocol, input_file, cache_size, associativity, block_size, 3, bus, gl);
 
     bus->init_cache(core0->get_cache(), core1->get_cache(), core2->get_cache(), core3->get_cache());
-    log_generator->initialize(core0, core1, core2, core3, input_info);
+    log_generator->initialize(core0, core1, core2, core3, input_info, block_size);
 
     std::thread th0(&Processor::run, core0);
     std::thread th1(&Processor::run, core1);

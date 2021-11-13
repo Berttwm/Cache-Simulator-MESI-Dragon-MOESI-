@@ -14,8 +14,12 @@ private:
     std::vector<Cache*> cache_list;
     std::string output_path = "logs/";
     int NUM_OF_CORES = 4;
+    int blk_size = 32;
 public:
-    void initialize(Processor* core0, Processor* core1, Processor* core2, Processor* core3, std::string input_info) {
+    void initialize(Processor* core0, Processor* core1, Processor* core2, Processor* core3, 
+                    std::string input_info, int block_size) {
+
+        blk_size = block_size;
         core_list.push_back(core0);
         core_list.push_back(core1);
         core_list.push_back(core2);
@@ -43,6 +47,15 @@ public:
         output_log << "Output Summary with Inputs: " << input_info << std::endl;
         output_log << "========================================" << std::endl;
 
+    }
+
+    void print_total_cycles() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "1. Overall execution cycle per core" << std::endl;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            long curr_val = core_list[i]->get_total_cycle();
+            output_log << "Core " << i << ": " << curr_val << std::endl;
+        }
     }
 
     void print_compute_cycles() {
@@ -82,6 +95,27 @@ public:
         }
     }
 
+    void print_amt_of_data_traffic() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "6. Amount of Data traffic in bytes on the bus" << std::endl;
+        int sum_traffic = 0;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            sum_traffic += core_list[i]->get_num_data_traffic();
+        }
+        sum_traffic *= blk_size;
+        output_log << sum_traffic << std::endl;
+    }
+
+    void print_num_update() {
+        output_log << "------------------------------" << std::endl;
+        output_log << "7. Number of invalidations or updates on the bus" << std::endl;
+        int sum_update = 0;
+        for (int i = 0; i < NUM_OF_CORES; i++) {
+            sum_update += core_list[i]->get_num_update();
+        }
+        output_log << sum_update << std::endl;
+    }
+
     void print_distribution_of_access() {
         output_log << "------------------------------" << std::endl;
         output_log << "8. Distribution of accesses to private data versus shared data" << std::endl;
@@ -96,12 +130,13 @@ public:
 
     void print_summary() {
 
-
+        print_total_cycles();
         print_compute_cycles();
         print_num_mem_instr();
         print_num_idle_cycle();
         print_cache_miss_rate();
-
+        print_amt_of_data_traffic();
+        print_num_update();
         print_distribution_of_access();
 
         output_log << "============== END OF LOG ==============" << std::endl;
