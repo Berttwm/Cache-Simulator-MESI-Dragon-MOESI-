@@ -22,16 +22,21 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 
 /*
 ** To maintain LRU replacement policy, old data in the given cache set are shifted to left till pos
-* pos = 0 for read-miss 
+*  pos = 0 for read-miss
+*  Output: return the cycle taken, once eviction occurs, the shifting takes 100 cycles
 */
-void Cache::shift_cacheline_left_until(int i_set, int pos) {
-    // If flush back occurs, 
+int Cache::shift_cacheline_left_until(int i_set, int pos) {
+    bool flush = false;
+    // If flush back occurs
     if (pos == 0 && dummy_cache[0][i_set][cache_line::status] == M) {
         num_data_traffic += 1;
+        flush = true;
     }
     for (int i = pos; i < num_ways-1; i++) { 
         dummy_cache[i][i_set] = dummy_cache[i+1][i_set];
-    }   
+    }
+
+    return flush? 100 : 0;
 }
 /* 
 ***************************************************************
@@ -65,7 +70,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     }
     // Read miss
     // Update LRU Policy - Read miss
-    shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
     num_cache_miss += 1;
     num_data_traffic += 1;
@@ -136,7 +141,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         curr_op_cycle += 2;
     }
     // Step 2: Update LRU Policy - Write Miss
-    shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
     // Step 3: Set last line to new and modified
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
     dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M; 
@@ -191,7 +196,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
     }
     // Read miss
     // Update LRU Policy - Read miss
-    shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
 
     Cache *placeholder;
@@ -249,7 +254,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
     }
     // Write-Miss 
     // Step 1: Update LRU Policy - Write Hit
-    shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
         // Fetching a block from memory to cache 
         // Step 2: Set last line to new and modified
