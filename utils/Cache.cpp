@@ -7,6 +7,7 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
     this->PID = PID;
     num_ways = associativity;
     num_sets = (cache_size / blk_size) / associativity;
+    block_size = blk_size;
     std::vector<int> temp(2, 0);
     std::vector<std::vector<int>> temp2;
     for (int i = 0; i < num_sets; i++) {
@@ -84,9 +85,9 @@ int Cache_MESI::pr_read(int i_set, int tag) {
         
     } else {
         // I -> S
-        // Fetching a block from other cache to my cache takes additional 2 cycles
+        // Fetching a block from other cache to my cache takes additional 2N cycles
         num_access_shared += 1;
-        curr_op_cycle += 2;
+        curr_op_cycle += 2 * (block_size/4);
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::S;
     }
     gl->gl_unlock(i_set);
@@ -134,11 +135,14 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         num_access_private += 1;
         curr_op_cycle += 100;
     } else {
-        // Fetching a block from another cache to mine takes 2 cycles
-        // Invalidate the block in other caches
-        num_update += bus->BusUpd(PID, i_set, tag, placeholder);
+        // Fetching a block from another cache to mine takes 2N cycles
+        curr_op_cycle += 2 * (block_size/4);
+
+        int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+        num_update += curr_update;
         num_access_shared += 1;
-        curr_op_cycle += 2;
+        // Invalidate the block in each other caches takes 2 
+        curr_op_cycle += 2*curr_update;
     }
     // Step 2: Update LRU Policy - Write Miss
     curr_op_cycle += shift_cacheline_left_until(i_set, 0); 

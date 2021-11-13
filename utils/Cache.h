@@ -14,6 +14,7 @@ public:
     int PID;
     int num_sets;
     int num_ways;
+    int block_size = 32;
     Bus *bus;
     GlobalLock *gl;
     std::vector<std::vector<std::vector<int>>> dummy_cache;
@@ -34,7 +35,7 @@ public:
     * 
     */
     void shift_cacheline_left(int i_set);
-    void shift_cacheline_left_until(int i_set, int pos);
+    int shift_cacheline_left_until(int i_set, int pos);
 
     virtual int pr_read(int i_set, int tag) = 0;
     virtual int pr_write(int i_set, int tag) = 0;
