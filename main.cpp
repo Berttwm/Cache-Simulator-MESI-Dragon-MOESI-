@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
     } else {
         if (strcmp(argv[1],"MESI") == 0) curr_protocol = protocol::MESI;
         else if (strcmp(argv[1],"Dragon") == 0) curr_protocol = protocol::Dragon;
+        else if (strcmp(argv[1],"MOESI") == 0) curr_protocol = protocol::MOESI;
         else std::cout << "[ERROR] Wrong protocol. Only MESI and Dragon are supported. " << std::endl;
 
         if (strcmp(argv[2],"blackscholes") == 0) input_file = benchmark::blackscholes;
@@ -69,6 +70,9 @@ int main(int argc, char* argv[]) {
             break;
         case protocol::Dragon:
             bus = new Bus_Dragon();
+            break;
+        case protocol::MOESI:
+            bus = new Bus_MOESI();
             break;
         default:
             std::cout << "[ERROR] Protocol type wrong (in bus)." << std::endl; 

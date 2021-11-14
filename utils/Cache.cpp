@@ -343,3 +343,46 @@ int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status, int op) {
     }
     return 1; // placeholder
 }
+
+/* 
+***************************************************************
+MOESI Cache Protocol APIs - Extension
+***************************************************************
+*/
+int Cache_MOESI::pr_read(int i_set, int tag) {
+    int curr_op_cycle = 1;
+    gl->gl_lock(i_set);
+
+    gl->gl_unlock(i_set);
+    return curr_op_cycle; // placeholder
+}
+
+int Cache_MOESI::pr_write(int i_set, int tag) {
+    int curr_op_cycle = 1;
+    Cache *placeholder;
+    gl->gl_lock(i_set);
+
+    gl->gl_unlock(i_set);
+    return curr_op_cycle; // placeholder
+}
+
+int Cache_MOESI::get_status_cacheline(int i_set, int tag) {
+    int status = status_MESI::I;
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) {
+            status = dummy_cache[i][i_set][cache_line::status];
+            break;
+        }
+    }
+    return status;
+}
+
+int Cache_MOESI::set_status_cacheline(int i_set, int tag, int status, int op) {
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
+            dummy_cache[i][i_set][cache_line::status] = status;
+            break;
+        }
+    }
+    return 1; 
+}

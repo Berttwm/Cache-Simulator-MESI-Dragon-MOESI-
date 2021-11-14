@@ -32,9 +32,7 @@ public:
 
     /*
     ** To maintain LRU replacement policy, old data in the given cache set are shifted to left
-    * 
     */
-    void shift_cacheline_left(int i_set);
     int shift_cacheline_left_until(int i_set, int pos);
 
     virtual int pr_read(int i_set, int tag) = 0;
@@ -65,5 +63,13 @@ public:
     int set_status_cacheline(int i_set, int tag, int status, int op);
 };
 
+class Cache_MOESI : public Cache {
+private:
+public:
+    int pr_read(int i_set, int tag);
+    int pr_write(int i_set, int tag);
+    int get_status_cacheline(int i_set, int tag);
+    int set_status_cacheline(int i_set, int tag, int status, int op);
+};
 
 #endif

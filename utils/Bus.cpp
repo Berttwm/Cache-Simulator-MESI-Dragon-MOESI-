@@ -56,7 +56,6 @@ int Bus_MESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
     }
     return num_invalidation; // result not used for MESI bus
 }
-
 /* 
 ***************************************************************
 Dragon Bus Protocol APIs
@@ -98,4 +97,42 @@ int Bus_Dragon::BusUpd(int PID, int i_set, int tag, Cache *cache) {
         if (curr_status != status_Dragon::not_found) break;
     }
     return num_update;
+}
+/* 
+***************************************************************
+MOESI Bus Protocol APIs
+***************************************************************
+*/
+int Bus_MOESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
+    int status = status_MOESI::I_MO;
+    for (int i = 0; i < num_cores; i++) {
+        if (i == PID) continue;
+
+        int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
+        if (curr_status != status_MOESI::I_MO) {
+            // Change M/E to S (Flush)
+            if (curr_status == status_MOESI::M_MO || status_MOESI::E_MO)
+                cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::S_MO, op_type::read_op);
+            status = curr_status;
+            break;
+        }
+        if (status != status_MOESI::I_MO) break;
+    }
+    return status;
+}
+
+int Bus_MOESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
+    // number of cycles for BusRdX should be 0
+    int num_invalidation = 0;  
+    for(int i = 0; i < num_cores; i++) {
+        if (i == PID) continue;
+
+        int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
+        if (curr_status != status_MOESI::I_MO) {
+            // Invalidate all cache Lines
+            num_invalidation += 1;
+            cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::I_MO, op_type::write_op);
+        }
+    }
+    return num_invalidation; // result not used for MESI bus
 }
