@@ -18,6 +18,11 @@ void Processor::initialize(int index, protocol prot, benchmark bm, int cache_siz
         cache->set_params(cache_size, associativity, block_size, PID, bus, gl);
         break;
 
+    case protocol::MOESI:
+        cache = new Cache_MOESI();
+        cache->set_params(cache_size, associativity, block_size, PID, bus, gl);
+        break;
+
     default:
         std::cout << "[ERROR] Protocol type wrong (in cache)." << std::endl; 
         return;   

@@ -41,4 +41,9 @@ class Bus_Dragon : public Bus {
     int BusUpd(int PID, int i_set, int tag, Cache *cache);
 };
 
+class Bus_MOESI : public Bus {
+    int BusRd(int PID, int i_set, int tag, Cache *cache);
+    int BusUpd(int PID, int i_set, int tag, Cache *cache);
+};
+
 #endif
