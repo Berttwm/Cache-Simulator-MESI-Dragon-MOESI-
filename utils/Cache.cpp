@@ -174,8 +174,12 @@ int Cache_MESI::get_status_cacheline(int i_set, int tag) {
 
 int Cache_MESI::set_status_cacheline(int i_set, int tag, int status, int op) {
     for (int i = 0; i < num_ways; i++) {
-        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) {
             dummy_cache[i][i_set][cache_line::status] = status;
+            // Update LRU policy of other cache if set_status is a write for Dragon protocol
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             break;
         }
     }
@@ -338,12 +342,10 @@ int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status, int op) {
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) {
             dummy_cache[i][i_set][cache_line::status] = status;
-            if(op == op_type::write_op) {
-                // Update LRU policy of other cache if set_status is a write for Dragon protocol
-                std::vector<int> temp = dummy_cache[i][i_set];
-                shift_cacheline_left_until(i_set,i);
-                dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
-            }
+            // Update LRU policy of other cache if set_status is a write for Dragon protocol
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             break;
         }
     }
@@ -396,7 +398,8 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::E_MO;
         
     } else if (curr_status == status_MOESI::O_MO) {
-        // Another cache is the owner - This cache now inherits ownership
+        // Another cache is the owner - This cache now inherits ownership (O)
+        //      The other cache is now invalidated (O->I)
         // Fetching a block from other cache to my cache takes additional 2N cycles
         num_access_shared += 1;
         curr_op_cycle += 2 * (block_size/4);
@@ -421,7 +424,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
 }
 
 int Cache_MOESI::get_status_cacheline(int i_set, int tag) {
-    int status = status_MESI::I;
+    int status = status_MOESI::I_MO;
     for (int i = 0; i < num_ways; i++) {
         if (dummy_cache[i][i_set][cache_line::tag] == tag) {
             status = dummy_cache[i][i_set][cache_line::status];
@@ -433,10 +436,14 @@ int Cache_MOESI::get_status_cacheline(int i_set, int tag) {
 
 int Cache_MOESI::set_status_cacheline(int i_set, int tag, int status, int op) {
     for (int i = 0; i < num_ways; i++) {
-        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) {
             dummy_cache[i][i_set][cache_line::status] = status;
+            // Update LRU policy of other cache if set_status is a write for Dragon protocol
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             break;
         }
     }
-    return 1; 
+    return 1; // placeholder
 }
