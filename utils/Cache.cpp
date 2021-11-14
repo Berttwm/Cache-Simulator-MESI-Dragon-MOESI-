@@ -57,7 +57,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
             shift_cacheline_left_until(i_set,i);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
             // check the type of access
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_MESI::M:
             case status_MESI::E_MESI:
                 num_access_private += 1;
@@ -103,25 +103,27 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
 
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            // 1. Update LRU Policy First - Write Hit
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+
+            // 2. Set status
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_MESI::M:
                 num_access_private += 1;
                 break;
             case status_MESI::E_MESI:
                 num_access_private += 1;
-                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
                 break;
             case status_MESI::S:
                 num_access_shared += 1;
-                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
                 Cache *placeholder;
                 num_update += bus->BusUpd(PID, i_set, tag, placeholder);
                 break;
             }
-            // Update LRU Policy - Write Hit
-            std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
-            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
             gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
@@ -198,7 +200,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
 
             // update the type of access based on the block status
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_Dragon::D:
             case status_Dragon::E_DRAGON:
                 num_access_private += 1;
@@ -246,10 +248,16 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            // 1. Shift before setting status
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
+            
+            // 2. Set status
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_Dragon::E_DRAGON:
                 // TODO
-                dummy_cache[i][i_set][cache_line::status] = status_Dragon::D;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::D;
             case status_Dragon::D:
                 // accessing E or D are both private data access
                 num_access_private += 1;
@@ -273,9 +281,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
                 break;
 
             }
-            std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
-            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
+            
             gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
