@@ -81,7 +81,6 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
     return status;
 }
 int Bus_Dragon::BusUpd(int PID, int i_set, int tag, Cache *cache) { 
-    // return number of cycles if you give other
     int num_update = 0;
     int curr_status;
     for (int i = 0; i < num_cores; i++) {
@@ -105,19 +104,24 @@ MOESI Bus Protocol APIs
 */
 int Bus_MOESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
     int status = status_MOESI::I_MO;
+    bool is_O = false;
     for (int i = 0; i < num_cores; i++) {
         if (i == PID) continue;
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MOESI::I_MO) {
             // Change M/E to S (Flush)
-            if (curr_status == status_MOESI::M_MO || status_MOESI::E_MO)
+            if(curr_status == status_MOESI::M_MO || status_MOESI::E_MO)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::S_MO, op_type::read_op);
+            if(curr_status == status_MOESI::O_MO) {
+                cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::I_MO, op_type::read_op);
+                is_O = true;
+            }        
             status = curr_status;
             break;
         }
-        if (status != status_MOESI::I_MO) break;
     }
+    if(is_O) return status_MOESI::O_MO;
     return status;
 }
 
