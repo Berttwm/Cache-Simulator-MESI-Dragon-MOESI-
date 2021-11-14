@@ -29,7 +29,9 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 int Cache::shift_cacheline_left_until(int i_set, int pos) {
     bool flush = false;
     // If flush back occurs
-    if (pos == 0 && dummy_cache[0][i_set][cache_line::status] == M) {
+    if (pos == 0 && (dummy_cache[0][i_set][cache_line::status] == status_MESI::M || 
+                    dummy_cache[0][i_set][cache_line::status] == status_Dragon::D ||
+                    dummy_cache[0][i_set][cache_line::status] == status_Dragon::Sm)) {
         num_data_traffic += 1;
         flush = true;
     }
@@ -193,12 +195,27 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
             // Update LRU Policy - Read hit
             std::vector<int> temp = dummy_cache[i][i_set];
             shift_cacheline_left_until(i_set,i);
-            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
+
+            // update the type of access based on the block status
+            switch (dummy_cache[i][i_set][cache_line::status]) {
+            case status_Dragon::D:
+            case status_Dragon::E_DRAGON:
+                num_access_private += 1;
+                break;
+            case status_Dragon::Sm:
+            case status_Dragon::Sc:
+                num_access_shared += 1;
+                break;
+            }
+
             gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
     }
     // Read miss
+    num_data_traffic += 1;
+    num_cache_miss += 1;
     // Update LRU Policy - Read miss
     curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
@@ -207,12 +224,14 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
         // not_found -> E
         // Fetching a block from memory to cache takes additional 100 cycles
+        num_access_private += 1;
         curr_op_cycle += 100;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::E_DRAGON;
     } else {
         // not_found -> Sc
-        // Fetching a block from other cache to my cache takes additional 2 cycles
-        curr_op_cycle += 2;
+        num_access_shared += 1;
+        // Fetching a block from other cache to my cache takes additional 2N cycles
+        curr_op_cycle += 2 * (block_size/4);
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sc;
     }
     gl->gl_unlock(i_set);
@@ -231,22 +250,28 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
             case status_Dragon::E_DRAGON:
                 // TODO
                 dummy_cache[i][i_set][cache_line::status] = status_Dragon::D;
+            case status_Dragon::D:
+                // accessing E or D are both private data access
+                num_access_private += 1;
                 break;
             case status_Dragon::Sc:
                 // Same as Sm
             case status_Dragon::Sm:
+                num_access_shared += 1;
                 if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
                     // not found in other cache
                     dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::D;
+                    curr_op_cycle += 100;
                 } else {
                     // found in other cache
-                    // Each write to another cache block incurs 2 cycles
-                    curr_op_cycle += bus->BusUpd(PID, i_set, tag, placeholder);
+                    // Each write to another cache block incurs 2N cycles
+                    num_update += bus->BusUpd(PID, i_set, tag, placeholder);
+                    num_data_traffic += num_update;
+                    curr_op_cycle += num_update * 2 * (block_size/4);
                     dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sm;
                 }
                 break;
-            case status_Dragon::D:
-                break;
+
             }
             std::vector<int> temp = dummy_cache[i][i_set];
             shift_cacheline_left_until(i_set,i);
@@ -257,26 +282,34 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
         
     }
     // Write-Miss 
+    num_cache_miss += 1;
+    // It takes 1 data traffic to fetch from either memory or other caches
+    num_data_traffic += 1;
     // Step 1: Update LRU Policy - Write Hit
     curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
         // Fetching a block from memory to cache 
+        num_access_private += 1;
         // Step 2: Set last line to new and modified
         dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::D; 
 
         curr_op_cycle += 100; // read from memory operation
     } else {
-        // Fetching a block from another cache to mine takes 2 cycles
-        // curr_op_cycle += 2;
+        // Fetching a block from another cache to mine takes 2N cycles
+        num_access_private += 1;
         // Step 2: Set last line to new and modified
         dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sm; 
 
-        curr_op_cycle += 2; // read from other cache lines first
+        curr_op_cycle += 2*(block_size/4); // read from other cache lines first
 
         // Step 3: then update all included cache lines
-        curr_op_cycle += bus->BusUpd(PID, i_set, tag, placeholder);
+        // For each BusUpd to other caches, it takes 2N cycles 
+        // where N = num of word and 1 word == 4 bytes
+        num_update += bus->BusUpd(PID, i_set, tag, placeholder);
+        num_data_traffic += num_update;
+        curr_op_cycle += num_update * 2 * (block_size/4);
     }
 
     gl->gl_unlock(i_set);

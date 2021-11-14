@@ -91,7 +91,7 @@ public:
         for (int i = 0; i < NUM_OF_CORES; i++) {
             int num_miss = core_list[i]->get_num_cache_miss();
             int num_instr = core_list[i]->get_num_mem_instr();
-            output_log << "Core " << i << ": " << num_miss/double(num_instr) << std::endl;
+            output_log << "Core " << i << ": " << double(num_miss)/double(num_instr) << std::endl;
         }
     }
 

@@ -2,10 +2,10 @@ Output Summary with Inputs: MESI_bodytrack_1024_1_16
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 69859628474290
-Core 1: 70670563320575
-Core 2: 102001927498
-Core 3: 72899198534249
+Core 0: 94088199816086
+Core 1: 95351973722297
+Core 2: 145509660056
+Core 3: 99596625638339
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 17729254
@@ -20,27 +20,27 @@ Core 2: 117698
 Core 3: 3324919
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 41314364
-Core 1: 40816792
-Core 2: 1855510
-Core 3: 42319891
+Core 0: 53874376
+Core 1: 53151072
+Core 2: 2726620
+Core 3: 55430869
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.129754
-Core 1: 0.126947
-Core 2: 0.171014
-Core 3: 0.130938
+Core 0: 0.12975
+Core 1: 0.126946
+Core 2: 0.171022
+Core 3: 0.130932
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-110431472
+110432512
 ------------------------------
 7. Number of invalidations or updates on the bus
-677
+603
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2943032 | Number of access to shared data = 327100
-Core 1: Number of access to private data = 2968760 | Number of access to shared data = 318492
-Core 2: Number of access to private data = 97138 | Number of access to shared data = 20560
-Core 3: Number of access to private data = 2991898 | Number of access to shared data = 333021
+Core 0: Number of access to private data = 3002542 | Number of access to shared data = 267590
+Core 1: Number of access to private data = 3030433 | Number of access to shared data = 256819
+Core 2: Number of access to private data = 97075 | Number of access to shared data = 20623
+Core 3: Number of access to private data = 3021443 | Number of access to shared data = 303476
 ============== END OF LOG ==============
 ========================================
