@@ -32,13 +32,13 @@ Core 2: -nan
 Core 3: -nan
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-80
+64
 ------------------------------
 7. Number of invalidations or updates on the bus
-1
+0
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 1 | Number of access to shared data = 1
+Core 0: Number of access to private data = 2 | Number of access to shared data = 0
 Core 1: Number of access to private data = 1 | Number of access to shared data = 2
 Core 2: Number of access to private data = 0 | Number of access to shared data = 0
 Core 3: Number of access to private data = 0 | Number of access to shared data = 0

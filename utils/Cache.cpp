@@ -32,6 +32,8 @@ int Cache::shift_cacheline_left_until(int i_set, int pos) {
     if (pos == 0 && (dummy_cache[0][i_set][cache_line::status] == status_MESI::M || 
                     dummy_cache[0][i_set][cache_line::status] == status_Dragon::D ||
                     dummy_cache[0][i_set][cache_line::status] == status_Dragon::Sm)) {
+        int test_status = dummy_cache[0][i_set][cache_line::status];
+        std::cout << "[" << PID << "] " << "Eviction occurs with status: " << test_status << std::endl;
         num_data_traffic += 1;
         flush = true;
     }
@@ -106,8 +108,14 @@ int Cache_MESI::pr_write(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
-            std::cout << "[" << PID << "] " << "Write Hit" << std::endl;
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            std::cout << "[" << PID << "] " << "Write Hit" << std::endl;            
+            // 1. Update LRU Policy First - Write Hit
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+
+            // 2. Set status
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_MESI::M:
                 num_access_private += 1;
                 break;
@@ -122,10 +130,6 @@ int Cache_MESI::pr_write(int i_set, int tag) {
                 num_update += bus->BusUpd(PID, i_set, tag, placeholder);
                 break;
             }
-            // Update LRU Policy - Write Hit
-            std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
-            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
             gl->gl_unlock(i_set);
             return curr_op_cycle;
         }

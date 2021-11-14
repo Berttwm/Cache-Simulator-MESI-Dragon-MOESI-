@@ -35,7 +35,7 @@ Core 3: -nan
 80
 ------------------------------
 7. Number of invalidations or updates on the bus
-1
+0
 ------------------------------
 8. Distribution of accesses to private data versus shared data
 Core 0: Number of access to private data = 1 | Number of access to shared data = 1
