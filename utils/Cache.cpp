@@ -60,7 +60,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
             shift_cacheline_left_until(i_set,i);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
             // check the type of access
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_MESI::M:
             case status_MESI::E_MESI:
                 num_access_private += 1;
@@ -121,11 +121,11 @@ int Cache_MESI::pr_write(int i_set, int tag) {
                 break;
             case status_MESI::E_MESI:
                 num_access_private += 1;
-                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
                 break;
             case status_MESI::S:
                 num_access_shared += 1;
-                dummy_cache[i][i_set][cache_line::status] = status_MESI::M;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
                 Cache *placeholder;
                 num_update += bus->BusUpd(PID, i_set, tag, placeholder);
                 break;
@@ -208,7 +208,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
 
             // update the type of access based on the block status
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_Dragon::D:
             case status_Dragon::E_DRAGON:
                 num_access_private += 1;
@@ -256,10 +256,16 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
-            switch (dummy_cache[i][i_set][cache_line::status]) {
+            // 1. Shift before setting status
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
+            
+            // 2. Set status
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
             case status_Dragon::E_DRAGON:
                 // TODO
-                dummy_cache[i][i_set][cache_line::status] = status_Dragon::D;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::D;
             case status_Dragon::D:
                 // accessing E or D are both private data access
                 num_access_private += 1;
@@ -283,9 +289,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
                 break;
 
             }
-            std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
-            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
+            
             gl->gl_unlock(i_set);
             return curr_op_cycle;
         }
@@ -352,4 +356,47 @@ int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status, int op) {
         }
     }
     return 1; // placeholder
+}
+
+/* 
+***************************************************************
+MOESI Cache Protocol APIs - Extension
+***************************************************************
+*/
+int Cache_MOESI::pr_read(int i_set, int tag) {
+    int curr_op_cycle = 1;
+    gl->gl_lock(i_set);
+
+    gl->gl_unlock(i_set);
+    return curr_op_cycle; // placeholder
+}
+
+int Cache_MOESI::pr_write(int i_set, int tag) {
+    int curr_op_cycle = 1;
+    Cache *placeholder;
+    gl->gl_lock(i_set);
+
+    gl->gl_unlock(i_set);
+    return curr_op_cycle; // placeholder
+}
+
+int Cache_MOESI::get_status_cacheline(int i_set, int tag) {
+    int status = status_MESI::I;
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) {
+            status = dummy_cache[i][i_set][cache_line::status];
+            break;
+        }
+    }
+    return status;
+}
+
+int Cache_MOESI::set_status_cacheline(int i_set, int tag, int status, int op) {
+    for (int i = 0; i < num_ways; i++) {
+        if (dummy_cache[i][i_set][cache_line::tag] == tag) { // if tag found
+            dummy_cache[i][i_set][cache_line::status] = status;
+            break;
+        }
+    }
+    return 1; 
 }
