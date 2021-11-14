@@ -369,10 +369,10 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
             // check the type of access
             switch (dummy_cache[i][i_set][cache_line::status]) {
             case status_MOESI::M_MO:
-            case status_MOESI::O_MO:          
             case status_MOESI::E_MO:
                 num_access_private += 1;
                 break; 
+            case status_MOESI::O_MO:          
             case status_MOESI::S_MO:
                 num_access_shared += 1;
                 break;
@@ -416,9 +416,64 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
 
 int Cache_MOESI::pr_write(int i_set, int tag) {
     int curr_op_cycle = 1;
-    Cache *placeholder;
     gl->gl_lock(i_set);
+    for (int i = 0; i < num_ways; i++) {
+        // Write hit
+        if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
 
+            // 1. Update LRU Policy First - Write Hit
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+
+            // 2. Set status
+            switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
+            case status_MESI::M:
+                num_access_private += 1;
+                break;
+            case status_MESI::E_MESI:
+                num_access_private += 1;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
+                break;
+            case status_MESI::S:
+                num_access_shared += 1;
+                dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
+                Cache *placeholder;
+                num_update += bus->BusUpd(PID, i_set, tag, placeholder);
+                break;
+            }
+            gl->gl_unlock(i_set);
+            return curr_op_cycle;
+        }
+            
+    }
+    // Write miss policy: Write-back, write-allocate
+    // Step 1: read line into cache block
+    num_cache_miss += 1;
+    num_data_traffic += 1;
+    Cache *placeholder;
+    if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
+        // Fetching a block from memory to cache takes additional 100 cycles
+        num_access_private += 1;
+        curr_op_cycle += 100;
+    } else {
+        // Fetching a block from another cache to mine takes 2N cycles
+        curr_op_cycle += 2 * (block_size/4);
+
+        int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+        num_update += curr_update;
+        num_access_shared += 1;
+        // Invalidate the block in each other caches takes 2 
+        curr_op_cycle += 2*curr_update;
+    }
+    // Step 2: Update LRU Policy - Write Miss
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    // Step 3: Set last line to new and modified
+    dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
+    dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M; 
+    
+    // Step 3: Invalidate all other cachelines
+    bus->BusUpd(PID, i_set, tag, placeholder);
     gl->gl_unlock(i_set);
     return curr_op_cycle; // placeholder
 }
