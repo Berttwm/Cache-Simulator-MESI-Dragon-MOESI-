@@ -53,7 +53,8 @@
         "thread": "cpp",
         "condition_variable": "cpp",
         "unordered_set": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "codecvt": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

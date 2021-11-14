@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "GlobalLock.hpp"
+#include "config.hpp"
 
 class Bus;
 
@@ -13,6 +14,7 @@ public:
     int PID;
     int num_sets;
     int num_ways;
+    int block_size = 32;
     Bus *bus;
     GlobalLock *gl;
     std::vector<std::vector<std::vector<int>>> dummy_cache;
@@ -20,9 +22,9 @@ public:
     // Statistics
     int num_cache_miss = 0;
     int num_data_traffic = 0;
-    int num_update = 0;
-    int num_access_private = 0;
-    int num_access_shared = 0;
+    int num_update = 0; // Number of invalidations or updates on the bus
+    int num_access_private = 0; // Access to modified state is private
+    int num_access_shared = 0; // Access to shared state is shared
 
     // Construct a dummy cache with shape: associativity(num_ways), num of cache set, 2
     // 2: index 0 for states, index 1 for tag
@@ -33,14 +35,14 @@ public:
     * 
     */
     void shift_cacheline_left(int i_set);
-    void shift_cacheline_left_until(int i_set, int pos);
+    int shift_cacheline_left_until(int i_set, int pos);
 
     virtual int pr_read(int i_set, int tag) = 0;
     virtual int pr_write(int i_set, int tag) = 0;
     /* Cache to bus transactions */
 
     virtual int get_status_cacheline(int i_set, int tag) = 0;
-    virtual int set_status_cacheline(int i_set, int tag, int status) = 0;
+    virtual int set_status_cacheline(int i_set, int tag, int status, int op) = 0;
         
 };
 
@@ -50,7 +52,7 @@ public:
     int pr_read(int i_set, int tag);
     int pr_write(int i_set, int tag);
     int get_status_cacheline(int i_set, int tag);
-    int set_status_cacheline(int i_set, int tag, int status);
+    int set_status_cacheline(int i_set, int tag, int status, int op);
 
 };
 
@@ -60,7 +62,7 @@ public:
     int pr_read(int i_set, int tag);
     int pr_write(int i_set, int tag);
     int get_status_cacheline(int i_set, int tag);
-    int set_status_cacheline(int i_set, int tag, int status);
+    int set_status_cacheline(int i_set, int tag, int status, int op);
 };
 
 

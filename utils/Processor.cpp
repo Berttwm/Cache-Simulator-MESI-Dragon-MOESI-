@@ -59,6 +59,42 @@ Cache* Processor::get_cache() {
     return cache;
 }
 
+long Processor::get_total_cycle() {
+    return total_cycle;
+}
+
+int Processor::get_compute_cycle() {
+    return compute_cycle;
+}
+
+int Processor::get_num_mem_instr() {
+    return num_mem_instr;
+}
+
+int Processor::get_idle_cycle() {
+    return idle_cycle;
+}
+
+int Processor::get_num_cache_miss() {
+    return cache->num_cache_miss;
+}
+
+int Processor::get_num_data_traffic() {
+    return cache->num_data_traffic;
+}
+
+int Processor::get_num_update() {
+    return cache->num_update;
+}
+
+int Processor::get_num_access_private() {
+    return cache->num_access_private;
+}
+
+int Processor::get_num_access_shared() {
+    return cache->num_access_shared;
+}
+
 void Processor::run() {
     std::string str_val;
     while(bm_file >> instr >> str_val) {
@@ -69,19 +105,22 @@ void Processor::run() {
         // std::cout << "[" << index_test << "]  " << instr << " | " << val << std::endl;
         
         if (instr == 0 || instr == 1) {
+            num_mem_instr += 1;
             int set_index = (val / N) % M;
             // std::cout << "[" << set_index << "]" << std::endl;
             int tag = (val / N) / M;
             if (instr == 0) { // read
-                total_cycle += cache->pr_read(set_index, tag);
+                idle_cycle += cache->pr_read(set_index, tag);      
             } else { // write
-                total_cycle += cache->pr_write(set_index, tag);
+                idle_cycle += cache->pr_write(set_index, tag);
             }
+            total_cycle += idle_cycle;
         } else {
             if (instr != 2) {
                 std::cout << "[ERROR] Instr index value goes out of range." << std::endl;
                 return;
             }
+            compute_cycle += val;
             total_cycle += val;
         }
         std::cout << "[" << PID << "] " << "Total cycles: " << total_cycle << std::endl;

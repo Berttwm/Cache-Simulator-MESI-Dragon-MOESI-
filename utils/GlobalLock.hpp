@@ -22,20 +22,21 @@ class GlobalLock {
         this->num_blocks = (cache_size / block_size) / associativity;
         std::vector<std::mutex> temp_locks_list(this->num_blocks);
         mutexes.swap(temp_locks_list);
-        std::cout << "GlobalLock initialized with: " << num_blocks << " locks" << std::endl;
+        std::cout << "[INFO] GlobalLock initialized with: " << num_blocks << " locks" << std::endl;
     }
     void gl_lock(int idx) {
         if(idx < 0 || idx > this->num_blocks) { // error input
             std::cout << "[ERROR] Global locks: trying to acquire lock that is not within range." << std::endl;
         } else {
-
+            mutexes[idx].lock();
         }
     }
     void gl_unlock(int idx) {
         if(idx < 0 || idx > this->num_blocks) { // error input
             std::cout << "[ERROR] Global locks: trying to release lock that is not within range." << std::endl;
         } else {
-            
+            mutexes[idx].unlock();
+
         }
     }
 };
