@@ -349,7 +349,6 @@ int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status, int op) {
     }
     return 1; // placeholder
 }
-
 /* 
 ***************************************************************
 MOESI Cache Protocol APIs - Extension
@@ -358,7 +357,56 @@ MOESI Cache Protocol APIs - Extension
 int Cache_MOESI::pr_read(int i_set, int tag) {
     int curr_op_cycle = 1;
     gl->gl_lock(i_set);
+    for (int i = 0; i < num_ways; i++) {
+        // Read hit
+        if ((dummy_cache[i][i_set][cache_line::status] != status_MOESI::I_MO) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+            // Update LRU Policy - Read Hit
+            std::vector<int> temp = dummy_cache[i][i_set];
+            shift_cacheline_left_until(i_set,i);
+            dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
+            // check the type of access
+            switch (dummy_cache[i][i_set][cache_line::status]) {
+            case status_MOESI::M_MO:
+            case status_MOESI::O_MO:          
+            case status_MOESI::E_MO:
+                num_access_private += 1;
+                break; 
+            case status_MOESI::S_MO:
+                num_access_shared += 1;
+                break;
+            }
 
+            gl->gl_unlock(i_set);
+            return curr_op_cycle;
+        }
+    }
+    // Read miss
+    // Update LRU Policy - Read miss
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
+    num_cache_miss += 1;
+    num_data_traffic += 1;
+    Cache *placeholder;
+    int curr_status = bus->BusRd(PID, i_set, tag, placeholder);
+    if (curr_status == status_MOESI::I_MO) {
+        // not found in any cache block
+        // Fetching a block from memory to cache takes additional 100 cycles
+        num_access_private += 1;
+        curr_op_cycle += 100;
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::E_MO;
+        
+    } else if (curr_status == status_MOESI::O_MO) {
+        // Another cache is the owner - This cache now inherits ownership
+        // Fetching a block from other cache to my cache takes additional 2N cycles
+        num_access_shared += 1;
+        curr_op_cycle += 2 * (block_size/4);
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::O_MO;
+    } else {
+        // exclusive or shared in another cache with no O_MO state
+        num_access_shared += 1;
+        curr_op_cycle += 2 * (block_size/4);
+        dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::S_MO;
+    }
     gl->gl_unlock(i_set);
     return curr_op_cycle; // placeholder
 }
