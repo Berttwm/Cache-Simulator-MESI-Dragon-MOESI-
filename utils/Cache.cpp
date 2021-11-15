@@ -206,6 +206,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Read hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+            std::cout << "[" << PID << "] " << "Read Hit" << std::endl;
             // Update LRU Policy - Read hit
             std::vector<int> temp = dummy_cache[i][i_set];
             shift_cacheline_left_until(i_set,i);
@@ -228,6 +229,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
         }
     }
     // Read miss
+    std::cout << "[" << PID << "] " << "Read Miss" << std::endl;
     num_data_traffic += 1;
     num_cache_miss += 1;
     // Update LRU Policy - Read miss
@@ -260,6 +262,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
     for (int i = 0; i < num_ways; i++) {
         // Write hit
         if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
+            std::cout << "[" << PID << "] " << "Write Hit" << std::endl;
             // 1. Shift before setting status
             std::vector<int> temp = dummy_cache[i][i_set];
             shift_cacheline_left_until(i_set,i);
@@ -300,6 +303,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
         
     }
     // Write-Miss 
+    std::cout << "[" << PID << "] " << "Write Miss" << std::endl;
     num_cache_miss += 1;
     // It takes 1 data traffic to fetch from either memory or other caches
     num_data_traffic += 1;
