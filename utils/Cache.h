@@ -33,7 +33,7 @@ public:
     /*
     ** To maintain LRU replacement policy, old data in the given cache set are shifted to left
     */
-    int shift_cacheline_left_until(int i_set, int pos);
+    int shift_cacheline_left_until(int i_set, int pos, bool for_new_element);
 
     virtual int pr_read(int i_set, int tag) = 0;
     virtual int pr_write(int i_set, int tag) = 0;
