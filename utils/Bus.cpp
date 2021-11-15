@@ -82,6 +82,7 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
     return status;
 }
 int Bus_Dragon::BusUpd(int PID, int i_set, int tag, Cache *cache) { 
+    
     int num_update = 0;
     int curr_status;
     for (int i = 0; i < num_cores; i++) {
@@ -89,6 +90,7 @@ int Bus_Dragon::BusUpd(int PID, int i_set, int tag, Cache *cache) {
 
         curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_Dragon::not_found) {
+            std::cout << "[" << PID << "] " << "Attempt to update core: " << i << std::endl;
             // Overwrite the target cache's cache line
             if (curr_status == status_Dragon::Sm)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sc, op_type::write_op);
