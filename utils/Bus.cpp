@@ -31,8 +31,7 @@ int Bus_MESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MESI::I) {
             // Change M/E to S (Flush)
-            if (curr_status == status_MESI::M || status_MESI::E_MESI)
-                cache_list[i]->set_status_cacheline(i_set, tag, status_MESI::S, op_type::read_op);
+            cache_list[i]->set_status_cacheline(i_set, tag, status_MESI::S, op_type::read_op);
             status = curr_status;
             break;
         }
@@ -69,9 +68,9 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_Dragon::not_found) {
             // change all exclusive states to shared states
-            if (curr_status == status_Dragon::D)
+            if (curr_status == status_Dragon::D || status_Dragon::Sm)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sm, op_type::read_op);
-            else if(curr_status == status_Dragon::E_DRAGON)
+            else if(curr_status == status_Dragon::E_DRAGON || status_Dragon::Sc)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sc, op_type::read_op);
             status = curr_status;
             break;
@@ -81,7 +80,6 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
     return status;
 }
 int Bus_Dragon::BusUpd(int PID, int i_set, int tag, Cache *cache) { 
-    // return number of cycles if you give other
     int num_update = 0;
     int curr_status;
     for (int i = 0; i < num_cores; i++) {
@@ -105,34 +103,37 @@ MOESI Bus Protocol APIs
 */
 int Bus_MOESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
     int status = status_MOESI::I_MO;
+    int o_status = status_MOESI::I_MO;
     for (int i = 0; i < num_cores; i++) {
         if (i == PID) continue;
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MOESI::I_MO) {
-            // Change M/E to S (Flush)
-            if (curr_status == status_MOESI::M_MO || status_MOESI::E_MO)
+            if(curr_status == status_MOESI::M_MO || status_MOESI::E_MO || status_MOESI::S_MO) {
                 cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::S_MO, op_type::read_op);
-            status = curr_status;
-            break;
+            }
+            if(curr_status == status_MOESI::O_MO) {
+                cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::I_MO, op_type::read_op);
+                o_status = curr_status;
+            }        
+            if(curr_status != status_MOESI::I_MO) status = curr_status;
         }
-        if (status != status_MOESI::I_MO) break;
     }
+    if(o_status != status_MOESI::I_MO) return o_status;
     return status;
 }
 
 int Bus_MOESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
-    // number of cycles for BusRdX should be 0
     int num_invalidation = 0;  
     for(int i = 0; i < num_cores; i++) {
         if (i == PID) continue;
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
-        if (curr_status != status_MOESI::I_MO) {
+        if (curr_status == status_MOESI::M_MO || status_MOESI::E_MO || status_MOESI::S_MO) {
             // Invalidate all cache Lines
             num_invalidation += 1;
             cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::I_MO, op_type::write_op);
         }
     }
-    return num_invalidation; // result not used for MESI bus
+    return num_invalidation; 
 }
