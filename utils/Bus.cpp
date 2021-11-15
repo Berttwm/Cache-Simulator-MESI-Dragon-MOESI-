@@ -68,9 +68,9 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_Dragon::not_found) {
             // change all exclusive states to shared states
-            if (curr_status == status_Dragon::D || status_Dragon::Sm)
+            if (curr_status == status_Dragon::D || curr_status == status_Dragon::Sm)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sm, op_type::read_op);
-            else if(curr_status == status_Dragon::E_DRAGON || status_Dragon::Sc)
+            else if(curr_status == status_Dragon::E_DRAGON || curr_status == status_Dragon::Sc)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sc, op_type::read_op);
             status = curr_status;
             break;
