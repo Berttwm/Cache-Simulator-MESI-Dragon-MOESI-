@@ -106,11 +106,10 @@ void Processor::run() {
         ss >> val;
             
         // std::cout << "[" << index_test << "]  " << instr << " | " << val << std::endl;
-        
         if (instr == 0 || instr == 1) {
             num_mem_instr += 1;
             int set_index = (val / N) % M;
-            // std::cout << "[" << set_index << "]" << std::endl;
+            std::cout << "[" << set_index << "]" << std::endl;
             int tag = (val / N) / M;
             if (instr == 0) { // read
                 idle_cycle += cache->pr_read(set_index, tag);      
