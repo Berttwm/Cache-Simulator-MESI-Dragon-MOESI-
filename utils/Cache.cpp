@@ -26,12 +26,12 @@ void Cache::set_params (int cache_size, int associativity, int blk_size, int PID
 *  pos = 0 for read-miss
 *  Output: return the cycle taken, once eviction occurs, the shifting takes 100 cycles
 */
-int Cache::shift_cacheline_left_until(int i_set, int pos) {
+int Cache::shift_cacheline_left_until(int i_set, int pos, bool for_new_element) {
     bool flush = false;
     // If flush back occurs
     if (pos == 0 && (dummy_cache[0][i_set][cache_line::status] == status_MESI::M || 
                     dummy_cache[0][i_set][cache_line::status] == status_Dragon::D ||
-                    dummy_cache[0][i_set][cache_line::status] == status_Dragon::Sm)) {
+                    dummy_cache[0][i_set][cache_line::status] == status_Dragon::Sm) && for_new_element) {
         num_data_traffic += 1;
         flush = true;
     }
@@ -54,7 +54,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // Update LRU Policy - Read Hit
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i,false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
             // check the type of access
             switch (dummy_cache[num_ways-1][i_set][cache_line::status]) {
@@ -73,7 +73,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
     }
     // Read miss
     // Update LRU Policy - Read miss
-    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
     num_cache_miss += 1;
     num_data_traffic += 1;
@@ -105,7 +105,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
 
             // 1. Update LRU Policy First - Write Hit
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i,false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
 
             // 2. Set status
@@ -149,7 +149,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         curr_op_cycle += 2*curr_update;
     }
     // Step 2: Update LRU Policy - Write Miss
-    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     // Step 3: Set last line to new and modified
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
     dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M; 
@@ -178,7 +178,7 @@ int Cache_MESI::set_status_cacheline(int i_set, int tag, int status, int op) {
             dummy_cache[i][i_set][cache_line::status] = status;
             // Update LRU policy of other cache if set_status is a write for Dragon protocol
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i,false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             break;
         }
@@ -200,7 +200,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
         if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // Update LRU Policy - Read hit
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i,false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
 
             // update the type of access based on the block status
@@ -223,7 +223,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
     num_data_traffic += 1;
     num_cache_miss += 1;
     // Update LRU Policy - Read miss
-    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
 
     Cache *placeholder;
@@ -254,7 +254,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
         if ((dummy_cache[i][i_set][cache_line::status] != status_Dragon::not_found) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // 1. Shift before setting status
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i,false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             
             // 2. Set status
@@ -296,7 +296,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
     // It takes 1 data traffic to fetch from either memory or other caches
     num_data_traffic += 1;
     // Step 1: Update LRU Policy - Write Hit
-    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_Dragon::not_found) {
         // Fetching a block from memory to cache 
         num_access_private += 1;
@@ -344,7 +344,7 @@ int Cache_Dragon::set_status_cacheline(int i_set, int tag, int status, int op) {
             dummy_cache[i][i_set][cache_line::status] = status;
             // Update LRU policy of other cache if set_status is a write for Dragon protocol
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i, false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             break;
         }
@@ -364,7 +364,7 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
         if ((dummy_cache[i][i_set][cache_line::status] != status_MOESI::I_MO) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // Update LRU Policy - Read Hit
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i, false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
             // check the type of access
             switch (dummy_cache[i][i_set][cache_line::status]) {
@@ -384,7 +384,7 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
     }
     // Read miss
     // Update LRU Policy - Read miss
-    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
     num_cache_miss += 1;
     num_data_traffic += 1;
@@ -423,7 +423,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
 
             // 1. Update LRU Policy First - Write Hit
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i, false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
 
             // 2. Set status
@@ -467,7 +467,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
         curr_op_cycle += 2*curr_update;
     }
     // Step 2: Update LRU Policy - Write Miss
-    curr_op_cycle += shift_cacheline_left_until(i_set, 0); 
+    curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     // Step 3: Set last line to new and modified
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; 
     dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M; 
@@ -495,7 +495,7 @@ int Cache_MOESI::set_status_cacheline(int i_set, int tag, int status, int op) {
             dummy_cache[i][i_set][cache_line::status] = status;
             // Update LRU policy of other cache if set_status is a write for Dragon protocol
             std::vector<int> temp = dummy_cache[i][i_set];
-            shift_cacheline_left_until(i_set,i);
+            shift_cacheline_left_until(i_set,i, false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp
             break;
         }
