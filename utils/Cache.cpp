@@ -373,8 +373,10 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
     gl->gl_lock(i_set);
     for (int i = 0; i < num_ways; i++) {
         // Read hit
+        
         if ((dummy_cache[i][i_set][cache_line::status] != status_MOESI::I_MO) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
             // Update LRU Policy - Read Hit
+            std::cout << "[" << PID << "] " << "Read Hit" << std::endl;
             std::vector<int> temp = dummy_cache[i][i_set];
             shift_cacheline_left_until(i_set,i, false);
             dummy_cache[num_ways-1][i_set] = temp; // set last line to temp 
@@ -396,6 +398,7 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
     }
     // Read miss
     // Update LRU Policy - Read miss
+    std::cout << "[" << PID << "] " << "Read Miss" << std::endl;
     curr_op_cycle += shift_cacheline_left_until(i_set, 0, true); 
     dummy_cache[num_ways-1][i_set][cache_line::tag] = tag; // set last line to new 
     num_cache_miss += 1;
@@ -405,6 +408,7 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
     if (curr_status == status_MOESI::I_MO) {
         // not found in any cache block
         // Fetching a block from memory to cache takes additional 100 cycles
+        std::cout << "[" << PID << "] " << "Fetch from memory" << std::endl;
         num_access_private += 1;
         curr_op_cycle += 100;
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::E_MO;
@@ -413,11 +417,13 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
         // Another cache is the owner - This cache now inherits ownership (O)
         //      The other cache is now invalidated (O->I)
         // Fetching a block from other cache to my cache takes additional 2N cycles
+        std::cout << "[" << PID << "] " << "Fetch from other caches" << std::endl;
         num_access_shared += 1;
         curr_op_cycle += 2 * (block_size/4);
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::O_MO;
     } else {
         // exclusive or shared in another cache with no O_MO state
+        std::cout << "[" << PID << "] " << "Fetch from other caches" << std::endl;
         num_access_shared += 1;
         curr_op_cycle += 2 * (block_size/4);
         dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::S_MO;
@@ -431,6 +437,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
     gl->gl_lock(i_set);
     for (int i = 0; i < num_ways; i++) {
         // Write hit
+        std::cout << "[" << PID << "] " << "Write Hit" << std::endl;
         if ((dummy_cache[i][i_set][cache_line::status] != status_MESI::I) && (dummy_cache[i][i_set][cache_line::tag] == tag)) {
 
             // 1. Update LRU Policy First - Write Hit
@@ -461,15 +468,18 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
     }
     // Write miss policy: Write-back, write-allocate
     // Step 1: read line into cache block
+    std::cout << "[" << PID << "] " << "Write Miss" << std::endl;
     num_cache_miss += 1;
     num_data_traffic += 1;
     Cache *placeholder;
     if (bus->BusRd(PID, i_set, tag, placeholder) == status_MESI::I) {
         // Fetching a block from memory to cache takes additional 100 cycles
+        std::cout << "[" << PID << "] " << "Fetch from memory" << std::endl;
         num_access_private += 1;
         curr_op_cycle += 100;
     } else {
         // Fetching a block from another cache to mine takes 2N cycles
+        std::cout << "[" << PID << "] " << "Fetch from other caches" << std::endl;
         curr_op_cycle += 2 * (block_size/4);
 
         int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
