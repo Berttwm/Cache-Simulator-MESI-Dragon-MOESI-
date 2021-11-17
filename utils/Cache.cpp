@@ -467,16 +467,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
         // Fetching a block from memory to cache takes additional 100 cycles
         num_access_private += 1;
         curr_op_cycle += 100;
-    } else if(curr_status == status_MOESI::O_MO) {
-        // Fetching a block from another cache to mine takes 2N cycles
-        curr_op_cycle += 2 * (block_size/4);
-
-        int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
-        num_update += curr_update;
-        num_access_shared += 1;
-
-        curr_op_cycle += 2*curr_update;
-    } else { // == status_MOESI::S_MO
+    } else { // == status_MOESI::S_MO, O_MO
         // Fetching a block from another cache to mine takes 2N cycles
         curr_op_cycle += 2 * (block_size/4);
 

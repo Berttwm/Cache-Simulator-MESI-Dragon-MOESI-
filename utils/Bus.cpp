@@ -30,7 +30,11 @@ int Bus_MESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MESI::I) {
-            // Change M/E to S (Flush)
+
+            // if curr_state is M, M->S, write back to memory
+            if (curr_status == status_MESI::M) {
+                cache_list[i]->num_data_traffic += 1;
+            }
             cache_list[i]->set_status_cacheline(i_set, tag, status_MESI::S, op_type::read_op);
             status = curr_status;
             break;
@@ -70,8 +74,6 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
             // change all exclusive states to shared states
             if (curr_status == status_Dragon::D || curr_status == status_Dragon::Sm) {
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sm, op_type::read_op);
-                // When BusRd on the block with D/Sm state, they will flush back to memory once
-                cache_list[i]->num_data_traffic += 1;
             } else if(curr_status == status_Dragon::E_DRAGON || curr_status == status_Dragon::Sc) {
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sc, op_type::read_op);
             }
@@ -112,13 +114,14 @@ int Bus_MOESI::BusRd(int PID, int i_set, int tag, Cache *cache) {
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
         if (curr_status != status_MOESI::I_MO) {
-            if(curr_status == status_MOESI::M_MO || status_MOESI::E_MO || status_MOESI::S_MO) {
+            if(curr_status == status_MOESI::M_MO || status_MOESI::O_MO) {
+                o_status = status_MOESI::M_MO;
+                cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::O_MO, op_type::read_op);
+            }
+            if(curr_status == status_MOESI::E_MO || status_MOESI::S_MO) {
                 cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::S_MO, op_type::read_op);
             }
-            if(curr_status == status_MOESI::O_MO) {
-                cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::I_MO, op_type::read_op);
-                o_status = curr_status;
-            }        
+
             if(curr_status != status_MOESI::I_MO) status = curr_status;
         }
     }
@@ -132,8 +135,8 @@ int Bus_MOESI::BusUpd(int PID, int i_set, int tag, Cache *cache) {
         if (i == PID) continue;
 
         int curr_status = cache_list[i]->get_status_cacheline(i_set, tag);
-        if (curr_status == status_MOESI::M_MO || status_MOESI::E_MO || status_MOESI::S_MO) {
-            // Invalidate all cache Lines
+        if (curr_status != status_MOESI::I_MO) {
+            // Invalidate all other cache Lines
             num_invalidation += 1;
             cache_list[i]->set_status_cacheline(i_set, tag, status_MOESI::I_MO, op_type::write_op);
         }
