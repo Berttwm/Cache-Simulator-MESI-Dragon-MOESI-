@@ -70,6 +70,8 @@ int Bus_Dragon::BusRd(int PID, int i_set, int tag, Cache *cache) {
             // change all exclusive states to shared states
             if (curr_status == status_Dragon::D || curr_status == status_Dragon::Sm)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sm, op_type::read_op);
+                // When BusRd on the block with D/Sm state, they will flush back to memory once
+                cache_list[i]->num_data_traffic += 1;
             else if(curr_status == status_Dragon::E_DRAGON || curr_status == status_Dragon::Sc)
                 cache_list[i]->set_status_cacheline(i_set, tag, status_Dragon::Sc, op_type::read_op);
             status = curr_status;
