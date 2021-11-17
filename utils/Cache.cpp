@@ -101,6 +101,7 @@ int Cache_MESI::pr_read(int i_set, int tag) {
 
 int Cache_MESI::pr_write(int i_set, int tag) {
     int curr_op_cycle = 1;
+    int curr_update = 0;
     gl->gl_lock(i_set);
     for (int i = 0; i < num_ways; i++) {
         // Write hit
@@ -125,7 +126,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
                 dummy_cache[num_ways-1][i_set][cache_line::status] = status_MESI::M;
                 Cache *placeholder;
 
-                int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+                curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
                 num_update += curr_update;
                 curr_op_cycle += 2*curr_update;
                 break;
@@ -148,7 +149,7 @@ int Cache_MESI::pr_write(int i_set, int tag) {
         // Fetching a block from another cache to mine takes 2N cycles
         curr_op_cycle += 2 * (block_size/4);
 
-        int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+        curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
         num_update += curr_update;
         num_access_shared += 1;
         // Invalidate the block in each other caches takes 2 
@@ -250,6 +251,7 @@ int Cache_Dragon::pr_read(int i_set, int tag) {
 
 int Cache_Dragon::pr_write(int i_set, int tag) {
     int curr_op_cycle = 1;
+    int curr_update = 0;
     Cache *placeholder;
     gl->gl_lock(i_set);
 
@@ -281,7 +283,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
                 } else {
                     // found in other cache
                     // Each write to another cache block incurs 2N cycles
-                    int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+                    curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
                     dummy_cache[num_ways-1][i_set][cache_line::status] = status_Dragon::Sm;
 
                     // Update counters
@@ -324,7 +326,7 @@ int Cache_Dragon::pr_write(int i_set, int tag) {
         // Step 3: then update all included cache lines
         // For each BusUpd to other caches, it takes 2N cycles 
         // where N = num of word and 1 word == 4 bytes
-        int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+        curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
         num_update += curr_update;
         num_data_traffic += curr_update;
         curr_op_cycle += curr_update * 2 * (block_size/4);
@@ -418,6 +420,7 @@ int Cache_MOESI::pr_read(int i_set, int tag) {
 
 int Cache_MOESI::pr_write(int i_set, int tag) {
     int curr_op_cycle = 1;
+    int curr_update = 0;
     gl->gl_lock(i_set);
     for (int i = 0; i < num_ways; i++) {
         // Write hit
@@ -439,7 +442,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
                 num_access_shared += 1;
                 dummy_cache[num_ways-1][i_set][cache_line::status] = status_MOESI::M_MO;
                 Cache *placeholder;
-                int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+                curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
                 num_update += curr_update;
                 // Sending a word from one cache to another takes 2 cycles
                 curr_op_cycle += curr_update * 2;
@@ -471,7 +474,7 @@ int Cache_MOESI::pr_write(int i_set, int tag) {
         // Fetching a block from another cache to mine takes 2N cycles
         curr_op_cycle += 2 * (block_size/4);
 
-        int curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
+        curr_update = bus->BusUpd(PID, i_set, tag, placeholder);
         num_update += curr_update;
         num_access_shared += 1;
 
