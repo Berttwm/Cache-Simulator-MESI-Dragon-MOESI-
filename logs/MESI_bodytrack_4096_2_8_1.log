@@ -1,11 +1,11 @@
-Output Summary with Inputs: MESI_bodytrack_4096_2_32
+Output Summary with Inputs: MESI_bodytrack_4096_2_8
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 36266119758598
-Core 1: 37996116206879
-Core 2: 54178344416
-Core 3: 37280912520535
+Core 0: 57504613529190
+Core 1: 61822868790589
+Core 2: 105993189276
+Core 3: 59111891019549
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 17729254
@@ -20,27 +20,27 @@ Core 2: 117698
 Core 3: 3324919
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 22587926
-Core 1: 22898490
-Core 2: 1078644
-Core 3: 22671855
+Core 0: 35644522
+Core 1: 36797826
+Core 2: 2288392
+Core 3: 36022627
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0563726
-Core 1: 0.0560018
-Core 2: 0.0701541
-Core 3: 0.0556901
+Core 0: 0.0852868
+Core 1: 0.0855271
+Core 2: 0.131379
+Core 3: 0.0841055
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-20640160
+8782232
 ------------------------------
 7. Number of invalidations or updates on the bus
-1121
+2137
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2791208 | Number of access to shared data = 478924
-Core 1: Number of access to private data = 2833143 | Number of access to shared data = 454109
-Core 2: Number of access to private data = 95366 | Number of access to shared data = 22332
-Core 3: Number of access to private data = 2844809 | Number of access to shared data = 480110
+Core 0: Number of access to private data = 2733344 | Number of access to shared data = 536788
+Core 1: Number of access to private data = 2748760 | Number of access to shared data = 538492
+Core 2: Number of access to private data = 96052 | Number of access to shared data = 21646
+Core 3: Number of access to private data = 2803205 | Number of access to shared data = 521714
 ============== END OF LOG ==============
 ========================================
