@@ -1,0 +1,46 @@
+Output Summary with Inputs: MOESI_blackscholes_4096_16_32
+========================================
+------------------------------
+1. Overall execution cycle per core
+Core 0: 3958399600611
+Core 1: 3749828741698
+Core 2: 5941372148819
+Core 3: 3919396679296
+------------------------------
+2. Number of compute cycles per core
+Core 0: 10430314
+Core 1: 10383276
+Core 2: 10430338
+Core 3: 10394904
+------------------------------
+3. Number of load/store instructions per core
+Core 0: 2497349
+Core 1: 2490468
+Core 2: 2509057
+Core 3: 2503127
+------------------------------
+4. Number of idle cycles per core
+Core 0: 3076487
+Core 1: 2988864
+Core 2: 3864781
+Core 3: 3052423
+------------------------------
+5. Data cache miss rate for each core
+Core 0: 0.0020754
+Core 1: 0.00180328
+Core 2: 0.00401824
+Core 3: 0.00204784
+------------------------------
+6. Amount of Data traffic in bytes on the bus
+1024384
+------------------------------
+7. Number of invalidations or updates on the bus
+129
+------------------------------
+8. Distribution of accesses to private data versus shared data
+Core 0: Number of access to private data = 2036233 | Number of access to shared data = 461030
+Core 1: Number of access to private data = 2037230 | Number of access to shared data = 453163
+Core 2: Number of access to private data = 2049071 | Number of access to shared data = 459971
+Core 3: Number of access to private data = 2040582 | Number of access to shared data = 462494
+============== END OF LOG ==============
+========================================
