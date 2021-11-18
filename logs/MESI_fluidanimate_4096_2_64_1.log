@@ -1,0 +1,46 @@
+Output Summary with Inputs: MESI_fluidanimate_4096_2_64
+========================================
+------------------------------
+1. Overall execution cycle per core
+Core 0: 35225478387812
+Core 1: 28644339557437
+Core 2: 37866003106218
+Core 3: 28387626245134
+------------------------------
+2. Number of compute cycles per core
+Core 0: 11337782
+Core 1: 11290799
+Core 2: 11337671
+Core 3: 11301515
+------------------------------
+3. Number of load/store instructions per core
+Core 0: 2576503
+Core 1: 2407844
+Core 2: 2604189
+Core 3: 2411465
+------------------------------
+4. Number of idle cycles per core
+Core 0: 21016337
+Core 1: 17234616
+Core 2: 22266745
+Core 3: 17004487
+------------------------------
+5. Data cache miss rate for each core
+Core 0: 0.0518552
+Core 1: 0.04361
+Core 2: 0.0553612
+Core 3: 0.0427466
+------------------------------
+6. Amount of Data traffic in bytes on the bus
+46187456
+------------------------------
+7. Number of invalidations or updates on the bus
+1802
+------------------------------
+8. Distribution of accesses to private data versus shared data
+Core 0: Number of access to private data = 2136133 | Number of access to shared data = 440370
+Core 1: Number of access to private data = 1965250 | Number of access to shared data = 442594
+Core 2: Number of access to private data = 2172101 | Number of access to shared data = 432088
+Core 3: Number of access to private data = 1958391 | Number of access to shared data = 453074
+============== END OF LOG ==============
+========================================

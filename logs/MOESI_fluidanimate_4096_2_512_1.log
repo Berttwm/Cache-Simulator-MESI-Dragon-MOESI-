@@ -1,0 +1,46 @@
+Output Summary with Inputs: MOESI_fluidanimate_4096_2_512
+========================================
+------------------------------
+1. Overall execution cycle per core
+Core 0: 74372567303736
+Core 1: 57022954833467
+Core 2: 75554106925610
+Core 3: 55304069436518
+------------------------------
+2. Number of compute cycles per core
+Core 0: 11337782
+Core 1: 11290799
+Core 2: 11337671
+Core 3: 11301515
+------------------------------
+3. Number of load/store instructions per core
+Core 0: 2576503
+Core 1: 2407844
+Core 2: 2604189
+Core 3: 2411465
+------------------------------
+4. Number of idle cycles per core
+Core 0: 61640857
+Core 1: 49114152
+Core 2: 62589069
+Core 3: 47950639
+------------------------------
+5. Data cache miss rate for each core
+Core 0: 0.145132
+Core 1: 0.123726
+Core 2: 0.145477
+Core 3: 0.120608
+------------------------------
+6. Amount of Data traffic in bytes on the bus
+833435648
+------------------------------
+7. Number of invalidations or updates on the bus
+94
+------------------------------
+8. Distribution of accesses to private data versus shared data
+Core 0: Number of access to private data = 2190686 | Number of access to shared data = 385816
+Core 1: Number of access to private data = 1994651 | Number of access to shared data = 413179
+Core 2: Number of access to private data = 2226455 | Number of access to shared data = 377733
+Core 3: Number of access to private data = 1985443 | Number of access to shared data = 426019
+============== END OF LOG ==============
+========================================

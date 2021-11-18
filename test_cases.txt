@@ -203,3 +203,28 @@ idle_cycles vs. block_size (cache_size = 4096, associativity = 2, bodytrack)
 ./coherence Dragon bodytrack 4096 2 128
 ./coherence Dragon bodytrack 4096 2 256
 ./coherence Dragon bodytrack 4096 2 512
+
+idle_cycles vs. block_size (cache_size = 4096, associativity = 2, fluidanimate)		
+./coherence MESI fluidanimate 4096 2 8
+./coherence MESI fluidanimate 4096 2 16
+./coherence MESI fluidanimate 4096 2 32
+./coherence MESI fluidanimate 4096 2 64
+./coherence MESI fluidanimate 4096 2 128
+./coherence MESI fluidanimate 4096 2 256
+./coherence MESI fluidanimate 4096 2 512
+												
+./coherence MOESI fluidanimate 4096 2 8
+./coherence MOESI fluidanimate 4096 2 16
+./coherence MOESI fluidanimate 4096 2 32
+./coherence MOESI fluidanimate 4096 2 64
+./coherence MOESI fluidanimate 4096 2 128
+./coherence MOESI fluidanimate 4096 2 256
+./coherence MOESI fluidanimate 4096 2 512
+
+./coherence Dragon fluidanimate 4096 2 8
+./coherence Dragon fluidanimate 4096 2 16
+./coherence Dragon fluidanimate 4096 2 32
+./coherence Dragon fluidanimate 4096 2 64
+./coherence Dragon fluidanimate 4096 2 128
+./coherence Dragon fluidanimate 4096 2 256
+./coherence Dragon fluidanimate 4096 2 512
