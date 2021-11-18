@@ -152,3 +152,28 @@ idle_cycles vs. associativity (cache_size = 4096, block_size = 32, fluidanimate)
 ./coherence Dragon fluidanimate 4096 16 32
 ./coherence Dragon fluidanimate 4096 32 32
 ./coherence Dragon fluidanimate 4096 64 32
+
+idle_cycles vs. block_size (cache_size = 4096, associativity = 2, blackscholes)		
+./coherence MESI blackscholes 4096 2 8
+./coherence MESI blackscholes 4096 2 16
+./coherence MESI blackscholes 4096 2 32
+./coherence MESI blackscholes 4096 2 64
+./coherence MESI blackscholes 4096 2 128
+./coherence MESI blackscholes 4096 2 256
+./coherence MESI blackscholes 4096 2 512
+												
+./coherence MOESI blackscholes 4096 2 8
+./coherence MOESI blackscholes 4096 2 16
+./coherence MOESI blackscholes 4096 2 32
+./coherence MOESI blackscholes 4096 2 64
+./coherence MOESI blackscholes 4096 2 128
+./coherence MOESI blackscholes 4096 2 256
+./coherence MOESI blackscholes 4096 2 512
+
+./coherence Dragon blackscholes 4096 2 8
+./coherence Dragon blackscholes 4096 2 16
+./coherence Dragon blackscholes 4096 2 32
+./coherence Dragon blackscholes 4096 2 64
+./coherence Dragon blackscholes 4096 2 128
+./coherence Dragon blackscholes 4096 2 256
+./coherence Dragon blackscholes 4096 2 512

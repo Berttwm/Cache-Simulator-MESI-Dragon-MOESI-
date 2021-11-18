@@ -1,11 +1,11 @@
-Output Summary with Inputs: Dragon_blackscholes_4096_64_32
+Output Summary with Inputs: MESI_blackscholes_4096_2_16
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 19259934428321
-Core 1: 19216060466622
-Core 2: 6015156589375
-Core 3: 19821465903192
+Core 0: 8280395898563
+Core 1: 7881204801668
+Core 2: 11578320513413
+Core 3: 8145910081966
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 10430314
@@ -20,27 +20,27 @@ Core 2: 2509057
 Core 3: 2503127
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 15393661
-Core 1: 15513020
-Core 2: 3908889
-Core 3: 15787455
+Core 0: 6495819
+Core 1: 6321050
+Core 2: 7817453
+Core 3: 6428403
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.00203055
-Core 1: 0.00176232
-Core 2: 0.00408919
-Core 3: 0.00200989
+Core 0: 0.0139972
+Core 1: 0.0136529
+Core 2: 0.0170024
+Core 3: 0.0138938
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-76245728
+2937136
 ------------------------------
 7. Number of invalidations or updates on the bus
-2350650
+354
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 572600 | Number of access to shared data = 1924749
-Core 1: Number of access to private data = 530145 | Number of access to shared data = 1960323
-Core 2: Number of access to private data = 2036982 | Number of access to shared data = 472075
-Core 3: Number of access to private data = 450097 | Number of access to shared data = 2053030
+Core 0: Number of access to private data = 2026147 | Number of access to shared data = 471202
+Core 1: Number of access to private data = 2019741 | Number of access to shared data = 470727
+Core 2: Number of access to private data = 2040110 | Number of access to shared data = 468947
+Core 3: Number of access to private data = 2030201 | Number of access to shared data = 472926
 ============== END OF LOG ==============
 ========================================

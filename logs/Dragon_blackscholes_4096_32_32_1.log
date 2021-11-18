@@ -2,10 +2,10 @@ Output Summary with Inputs: Dragon_blackscholes_4096_32_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 19619484580233
-Core 1: 19501930890890
-Core 2: 6005186962307
-Core 3: 12285657583688
+Core 0: 17925968417493
+Core 1: 19803027605766
+Core 2: 6013740802947
+Core 3: 14060692744108
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 10430314
@@ -20,27 +20,27 @@ Core 2: 2509057
 Core 3: 2503127
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 15690277
-Core 1: 15748624
-Core 2: 3901909
-Core 3: 9735103
+Core 0: 14321661
+Core 1: 15987424
+Core 2: 3906633
+Core 3: 11163099
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.00203055
-Core 1: 0.00175991
-Core 2: 0.00406448
-Core 3: 0.00201708
+Core 0: 0.00203015
+Core 1: 0.00176071
+Core 2: 0.0040585
+Core 3: 0.00201668
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-65180192
+65780672
 ------------------------------
 7. Number of invalidations or updates on the bus
-2004928
+2023702
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 529130 | Number of access to shared data = 1968219
-Core 1: Number of access to private data = 500778 | Number of access to shared data = 1989690
-Core 2: Number of access to private data = 2037410 | Number of access to shared data = 471647
-Core 3: Number of access to private data = 1259624 | Number of access to shared data = 1243503
+Core 0: Number of access to private data = 706569 | Number of access to shared data = 1790780
+Core 1: Number of access to private data = 397246 | Number of access to shared data = 2093222
+Core 2: Number of access to private data = 2040208 | Number of access to shared data = 468849
+Core 3: Number of access to private data = 1082566 | Number of access to shared data = 1420561
 ============== END OF LOG ==============
 ========================================

@@ -1,11 +1,11 @@
-Output Summary with Inputs: Dragon_blackscholes_4096_64_32
+Output Summary with Inputs: MESI_blackscholes_4096_2_128
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 19259934428321
-Core 1: 19216060466622
-Core 2: 6015156589375
-Core 3: 19821465903192
+Core 0: 13265237801307
+Core 1: 13063071037256
+Core 2: 14225321058855
+Core 3: 13332626157338
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 10430314
@@ -20,27 +20,27 @@ Core 2: 2509057
 Core 3: 2503127
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 15393661
-Core 1: 15513020
-Core 2: 3908889
-Core 3: 15787455
+Core 0: 10601039
+Core 1: 10498690
+Core 2: 10969765
+Core 3: 10589607
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.00203055
-Core 1: 0.00176232
-Core 2: 0.00408919
-Core 3: 0.00200989
+Core 0: 0.0307378
+Core 1: 0.0304886
+Core 2: 0.0314612
+Core 3: 0.0304399
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-76245728
+47152256
 ------------------------------
 7. Number of invalidations or updates on the bus
-2350650
+140
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 572600 | Number of access to shared data = 1924749
-Core 1: Number of access to private data = 530145 | Number of access to shared data = 1960323
-Core 2: Number of access to private data = 2036982 | Number of access to shared data = 472075
-Core 3: Number of access to private data = 450097 | Number of access to shared data = 2053030
+Core 0: Number of access to private data = 2059614 | Number of access to shared data = 437735
+Core 1: Number of access to private data = 2052766 | Number of access to shared data = 437702
+Core 2: Number of access to private data = 2071387 | Number of access to shared data = 437670
+Core 3: Number of access to private data = 2065624 | Number of access to shared data = 437503
 ============== END OF LOG ==============
 ========================================
