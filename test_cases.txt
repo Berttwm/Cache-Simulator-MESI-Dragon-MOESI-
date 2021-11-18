@@ -1,0 +1,29 @@
+To prove the correctness of each protocol: (With 4096_2_32)																									
+./coherence MESI blackscholes 4096 2 32
+./coherence MESI bodytrack 4096 2 32
+./coherence MESI fluidanimate 4096 2 32
+
+./coherence MOESI blackscholes 4096 2 32
+./coherence MOESI bodytrack 4096 2 32
+./coherence MOESI fluidanimate 4096 2 32
+
+./coherence Dragon blackscholes 4096 2 32
+./coherence Dragon bodytrack 4096 2 32
+./coherence Dragon fluidanimate 4096 2 32
+
+idle_cycles vs. cache_size (associativity = 2, block_size = 3, blackscholes)												
+./coherence MESI blackscholes 1024 2 32
+./coherence MESI blackscholes 2048 2 32
+./coherence MESI blackscholes 4096 2 32
+./coherence MESI blackscholes 8192 2 32
+./coherence MESI blackscholes 16384 2 32
+./coherence MESI blackscholes 32768 2 32
+
+
+idle_cycles vs. cache_size (associativity = 2, block_size = 3, blackscholes)												
+./coherence MESI blackscholes 1024 2 32
+./coherence MESI blackscholes 2048 2 32
+./coherence MESI blackscholes 4096 2 32
+./coherence MESI blackscholes 8192 2 32
+./coherence MESI blackscholes 16384 2 32
+./coherence MESI blackscholes 32768 2 32
