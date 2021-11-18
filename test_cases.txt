@@ -102,3 +102,28 @@ idle_cycles vs. associativity (cache_size = 4096, block_size = 32, blackscholes)
 ./coherence Dragon blackscholes 4096 16 32
 ./coherence Dragon blackscholes 4096 32 32
 ./coherence Dragon blackscholes 4096 64 32
+
+idle_cycles vs. associativity (cache_size = 4096, block_size = 32, bodytrack)		
+./coherence MESI bodytrack 4096 1 32
+./coherence MESI bodytrack 4096 2 32
+./coherence MESI bodytrack 4096 4 32
+./coherence MESI bodytrack 4096 8 32
+./coherence MESI bodytrack 4096 16 32
+./coherence MESI bodytrack 4096 32 32
+./coherence MESI bodytrack 4096 64 32
+												
+./coherence MOESI bodytrack 4096 1 32
+./coherence MOESI bodytrack 4096 2 32
+./coherence MOESI bodytrack 4096 4 32
+./coherence MOESI bodytrack 4096 8 32
+./coherence MOESI bodytrack 4096 16 32
+./coherence MOESI bodytrack 4096 32 32
+./coherence MOESI bodytrack 4096 64 32
+
+./coherence Dragon blackscholes 4096 1 32
+./coherence Dragon blackscholes 4096 2 32
+./coherence Dragon blackscholes 4096 4 32
+./coherence Dragon blackscholes 4096 8 32
+./coherence Dragon blackscholes 4096 16 32
+./coherence Dragon blackscholes 4096 32 32
+./coherence Dragon blackscholes 4096 64 32
