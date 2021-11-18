@@ -1,11 +1,11 @@
-Output Summary with Inputs: MESI_fluidanimate_4096_2_32
+Output Summary with Inputs: Dragon_fluidanimate_16384_2_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 47151380543694
-Core 1: 40050190831507
-Core 2: 50785009805982
-Core 3: 39765009684190
+Core 0: 33320868404130
+Core 1: 28282678933537
+Core 2: 34413789325446
+Core 3: 28601380961700
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 11337782
@@ -20,27 +20,27 @@ Core 2: 2604189
 Core 3: 2411465
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 25890959
-Core 1: 22995872
-Core 2: 27375511
-Core 3: 22785769
+Core 0: 17735987
+Core 1: 16024024
+Core 2: 17998717
+Core 3: 16229213
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0585088
-Core 1: 0.0551651
-Core 2: 0.0614809
-Core 3: 0.0545967
+Core 0: 0.0358474
+Core 1: 0.0351248
+Core 2: 0.0361652
+Core 3: 0.0351467
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-29632096
+19687360
 ------------------------------
 7. Number of invalidations or updates on the bus
-2443
+19887
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2139089 | Number of access to shared data = 437414
-Core 1: Number of access to private data = 1988268 | Number of access to shared data = 419576
-Core 2: Number of access to private data = 2174441 | Number of access to shared data = 429748
-Core 3: Number of access to private data = 1980345 | Number of access to shared data = 431120
+Core 0: Number of access to private data = 2122360 | Number of access to shared data = 454143
+Core 1: Number of access to private data = 1972039 | Number of access to shared data = 435805
+Core 2: Number of access to private data = 2142453 | Number of access to shared data = 461736
+Core 3: Number of access to private data = 1916904 | Number of access to shared data = 494561
 ============== END OF LOG ==============
 ========================================

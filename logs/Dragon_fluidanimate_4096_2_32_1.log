@@ -2,10 +2,10 @@ Output Summary with Inputs: Dragon_fluidanimate_4096_2_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 47155650000418
-Core 1: 40081784117945
-Core 2: 50858312074618
-Core 3: 39916960649844
+Core 0: 47182940252038
+Core 1: 40028865664897
+Core 2: 50833326345726
+Core 3: 39896331463892
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 11337782
@@ -20,27 +20,27 @@ Core 2: 2604189
 Core 3: 2411465
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 25896551
-Core 1: 22995372
-Core 2: 27406305
-Core 3: 22864957
+Core 0: 25905923
+Core 1: 22977972
+Core 2: 27395993
+Core 3: 22854049
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0584587
-Core 1: 0.0551174
-Core 2: 0.0614671
-Core 3: 0.0545424
+Core 0: 0.0584672
+Core 1: 0.0551232
+Core 2: 0.061479
+Core 3: 0.0545444
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-29832224
+29837440
 ------------------------------
 7. Number of invalidations or updates on the bus
-8694
+8933
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2137276 | Number of access to shared data = 439227
-Core 1: Number of access to private data = 1981417 | Number of access to shared data = 426427
-Core 2: Number of access to private data = 2175412 | Number of access to shared data = 428777
-Core 3: Number of access to private data = 1967892 | Number of access to shared data = 443573
+Core 0: Number of access to private data = 2136883 | Number of access to shared data = 439620
+Core 1: Number of access to private data = 1969222 | Number of access to shared data = 438622
+Core 2: Number of access to private data = 2171966 | Number of access to shared data = 432223
+Core 3: Number of access to private data = 1968437 | Number of access to shared data = 443028
 ============== END OF LOG ==============
 ========================================

@@ -1,11 +1,11 @@
-Output Summary with Inputs: MESI_fluidanimate_4096_2_32
+Output Summary with Inputs: MESI_fluidanimate_8192_2_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 47151380543694
-Core 1: 40050190831507
-Core 2: 50785009805982
-Core 3: 39765009684190
+Core 0: 41400939739542
+Core 1: 35644600288407
+Core 2: 44323675293504
+Core 3: 35431815372610
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 11337782
@@ -20,27 +20,27 @@ Core 2: 2604189
 Core 3: 2411465
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 25890959
-Core 1: 22995872
-Core 2: 27375511
-Core 3: 22785769
+Core 0: 21895355
+Core 1: 20092004
+Core 2: 23010765
+Core 3: 19944425
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0585088
-Core 1: 0.0551651
-Core 2: 0.0614809
-Core 3: 0.0545967
+Core 0: 0.0466947
+Core 1: 0.0465076
+Core 2: 0.0488279
+Core 3: 0.0460716
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-29632096
+25037600
 ------------------------------
 7. Number of invalidations or updates on the bus
-2443
+3496
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2139089 | Number of access to shared data = 437414
-Core 1: Number of access to private data = 1988268 | Number of access to shared data = 419576
-Core 2: Number of access to private data = 2174441 | Number of access to shared data = 429748
-Core 3: Number of access to private data = 1980345 | Number of access to shared data = 431120
+Core 0: Number of access to private data = 2128965 | Number of access to shared data = 447538
+Core 1: Number of access to private data = 1961422 | Number of access to shared data = 446422
+Core 2: Number of access to private data = 2163676 | Number of access to shared data = 440513
+Core 3: Number of access to private data = 1958627 | Number of access to shared data = 452838
 ============== END OF LOG ==============
 ========================================

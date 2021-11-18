@@ -1,11 +1,11 @@
-Output Summary with Inputs: MESI_fluidanimate_4096_2_32
+Output Summary with Inputs: MESI_fluidanimate_16384_2_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 47151380543694
-Core 1: 40050190831507
-Core 2: 50785009805982
-Core 3: 39765009684190
+Core 0: 33299809329962
+Core 1: 28067131428193
+Core 2: 34318030673452
+Core 3: 28026483624288
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 11337782
@@ -20,27 +20,27 @@ Core 2: 2604189
 Core 3: 2411465
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 25890959
-Core 1: 22995872
-Core 2: 27375511
-Core 3: 22785769
+Core 0: 17719477
+Core 1: 15907994
+Core 2: 17950641
+Core 3: 15959875
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0585088
-Core 1: 0.0551651
-Core 2: 0.0614809
-Core 3: 0.0545967
+Core 0: 0.0360229
+Core 1: 0.0353482
+Core 2: 0.0363142
+Core 3: 0.0354067
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-29632096
+19241856
 ------------------------------
 7. Number of invalidations or updates on the bus
-2443
+5121
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2139089 | Number of access to shared data = 437414
-Core 1: Number of access to private data = 1988268 | Number of access to shared data = 419576
-Core 2: Number of access to private data = 2174441 | Number of access to shared data = 429748
-Core 3: Number of access to private data = 1980345 | Number of access to shared data = 431120
+Core 0: Number of access to private data = 2117862 | Number of access to shared data = 458641
+Core 1: Number of access to private data = 1945330 | Number of access to shared data = 462514
+Core 2: Number of access to private data = 2157661 | Number of access to shared data = 446528
+Core 3: Number of access to private data = 1952811 | Number of access to shared data = 458654
 ============== END OF LOG ==============
 ========================================

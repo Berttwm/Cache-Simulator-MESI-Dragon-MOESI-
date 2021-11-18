@@ -11,7 +11,7 @@ To prove the correctness of each protocol: (With 4096_2_32)
 ./coherence Dragon bodytrack 4096 2 32
 ./coherence Dragon fluidanimate 4096 2 32
 
-idle_cycles vs. cache_size (associativity = 2, block_size = 3, blackscholes)												
+idle_cycles vs. cache_size (associativity = 2, block_size = 32, blackscholes)												
 ./coherence MESI blackscholes 1024 2 32
 ./coherence MESI blackscholes 2048 2 32
 ./coherence MESI blackscholes 4096 2 32
@@ -33,7 +33,7 @@ idle_cycles vs. cache_size (associativity = 2, block_size = 3, blackscholes)
 ./coherence Dragon blackscholes 16384 2 32
 ./coherence Dragon blackscholes 32768 2 32
 
-idle_cycles vs. cache_size (associativity = 2, block_size = 3, bodytrack)												
+idle_cycles vs. cache_size (associativity = 2, block_size = 32, bodytrack)												
 ./coherence MESI bodytrack 1024 2 32
 ./coherence MESI bodytrack 2048 2 32
 ./coherence MESI bodytrack 4096 2 32
@@ -54,3 +54,48 @@ idle_cycles vs. cache_size (associativity = 2, block_size = 3, bodytrack)
 ./coherence Dragon bodytrack 8192 2 32
 ./coherence Dragon bodytrack 16384 2 32
 ./coherence Dragon bodytrack 32768 2 32
+
+idle_cycles vs. cache_size (associativity = 2, block_size = 32, bodytrack)												
+./coherence MESI fluidanimate 1024 2 32
+./coherence MESI fluidanimate 2048 2 32
+./coherence MESI fluidanimate 4096 2 32
+./coherence MESI fluidanimate 8192 2 32
+./coherence MESI fluidanimate 16384 2 32
+./coherence MESI fluidanimate 32768 2 32
+												
+./coherence MOESI fluidanimate 1024 2 32
+./coherence MOESI fluidanimate 2048 2 32
+./coherence MOESI fluidanimate 4096 2 32
+./coherence MOESI fluidanimate 8192 2 32
+./coherence MOESI fluidanimate 16384 2 32
+./coherence MOESI fluidanimate 32768 2 32
+
+./coherence Dragon fluidanimate 1024 2 32
+./coherence Dragon fluidanimate 2048 2 32
+./coherence Dragon fluidanimate 4096 2 32
+./coherence Dragon fluidanimate 8192 2 32
+./coherence Dragon fluidanimate 16384 2 32
+./coherence Dragon fluidanimate 32768 2 32
+
+
+idle_cycles vs. associativity (cache_size = 4096, block_size = 32, blackscholes)		
+./coherence MESI blackscholes 4096 1 32
+./coherence MESI blackscholes 4096 2 32
+./coherence MESI blackscholes 4096 4 32
+./coherence MESI blackscholes 4096 8 32
+./coherence MESI blackscholes 4096 16 32
+./coherence MESI blackscholes 4096 32 32
+												
+./coherence MOESI blackscholes 4096 1 32
+./coherence MOESI blackscholes 4096 2 32
+./coherence MOESI blackscholes 4096 4 32
+./coherence MOESI blackscholes 4096 8 32
+./coherence MOESI blackscholes 4096 16 32
+./coherence MOESI blackscholes 4096 32 32
+
+./coherence Dragon blackscholes 4096 1 32
+./coherence Dragon blackscholes 4096 2 32
+./coherence Dragon blackscholes 4096 4 32
+./coherence Dragon blackscholes 4096 8 32
+./coherence Dragon blackscholes 4096 16 32
+./coherence Dragon blackscholes 4096 32 32

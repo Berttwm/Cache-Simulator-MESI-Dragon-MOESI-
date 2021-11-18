@@ -2,10 +2,10 @@ Output Summary with Inputs: MOESI_fluidanimate_4096_2_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 47100737564256
-Core 1: 40079918973623
-Core 2: 50708788886652
-Core 3: 39788752731032
+Core 0: 47136099365726
+Core 1: 40105289322187
+Core 2: 50822424507492
+Core 3: 39868186966100
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 11337782
@@ -20,27 +20,27 @@ Core 2: 2604189
 Core 3: 2411465
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 25864195
-Core 1: 22996760
-Core 2: 27333093
-Core 3: 22787815
+Core 0: 25865391
+Core 1: 23035310
+Core 2: 27379309
+Core 3: 22854551
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0584672
-Core 1: 0.0551061
-Core 2: 0.0614291
-Core 3: 0.0545171
+Core 0: 0.0584762
+Core 1: 0.0551086
+Core 2: 0.0614587
+Core 3: 0.0545059
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-29545568
+29553760
 ------------------------------
 7. Number of invalidations or updates on the bus
-773
+692
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2148008 | Number of access to shared data = 428479
-Core 1: Number of access to private data = 1984836 | Number of access to shared data = 422983
-Core 2: Number of access to private data = 2179298 | Number of access to shared data = 424880
-Core 3: Number of access to private data = 1981251 | Number of access to shared data = 430213
+Core 0: Number of access to private data = 2142801 | Number of access to shared data = 433689
+Core 1: Number of access to private data = 1989273 | Number of access to shared data = 418551
+Core 2: Number of access to private data = 2189084 | Number of access to shared data = 415104
+Core 3: Number of access to private data = 1986208 | Number of access to shared data = 425252
 ============== END OF LOG ==============
 ========================================
