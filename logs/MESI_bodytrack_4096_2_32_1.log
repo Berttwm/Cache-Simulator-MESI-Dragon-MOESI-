@@ -2,10 +2,10 @@ Output Summary with Inputs: MESI_bodytrack_4096_2_32
 ========================================
 ------------------------------
 1. Overall execution cycle per core
-Core 0: 36386743882846
-Core 1: 37885679901267
-Core 2: 54419052510
-Core 3: 37130623033113
+Core 0: 36366384823594
+Core 1: 38134949937401
+Core 2: 54285255718
+Core 3: 37243221934855
 ------------------------------
 2. Number of compute cycles per core
 Core 0: 17729254
@@ -20,27 +20,27 @@ Core 2: 117698
 Core 3: 3324919
 ------------------------------
 4. Number of idle cycles per core
-Core 0: 22571020
-Core 1: 22854624
-Core 2: 1081780
-Core 3: 22626999
+Core 0: 22616018
+Core 1: 22868094
+Core 2: 1079206
+Core 3: 22687095
 ------------------------------
 5. Data cache miss rate for each core
-Core 0: 0.0563711
-Core 1: 0.055996
-Core 2: 0.0701796
-Core 3: 0.0557111
+Core 0: 0.0563754
+Core 1: 0.0559963
+Core 2: 0.0701116
+Core 3: 0.0556829
 ------------------------------
 6. Amount of Data traffic in bytes on the bus
-20643584
+20637280
 ------------------------------
 7. Number of invalidations or updates on the bus
-1127
+1072
 ------------------------------
 8. Distribution of accesses to private data versus shared data
-Core 0: Number of access to private data = 2797888 | Number of access to shared data = 472244
-Core 1: Number of access to private data = 2819817 | Number of access to shared data = 467435
-Core 2: Number of access to private data = 95342 | Number of access to shared data = 22356
-Core 3: Number of access to private data = 2840116 | Number of access to shared data = 484803
+Core 0: Number of access to private data = 2801072 | Number of access to shared data = 469060
+Core 1: Number of access to private data = 2831730 | Number of access to shared data = 455522
+Core 2: Number of access to private data = 95391 | Number of access to shared data = 22307
+Core 3: Number of access to private data = 2850972 | Number of access to shared data = 473947
 ============== END OF LOG ==============
 ========================================
